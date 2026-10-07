@@ -9,5 +9,9 @@
   "devDependencies": {
     "@electron/packager": "^18.4.4",
     "electron": "^38.8.6"
+  },
+  "scripts": {
+    "start": "electron .",
+    "package": "electron-packager . \"Mes Relances\" --platform=win32 --arch=x64 --icon=icon.ico --overwrite --out=out"
   }
 }
