@@ -1,0 +1,13 @@
+{
+  "name": "mes-relances",
+  "productName": "Mes Relances",
+  "version": "3.1.0",
+  "description": "Suivi et relance des agences d'interim et entreprises",
+  "main": "main.js",
+  "author": "Mes Relances",
+  "license": "MIT",
+  "devDependencies": {
+    "@electron/packager": "^18.4.4",
+    "electron": "^38.8.6"
+  }
+}

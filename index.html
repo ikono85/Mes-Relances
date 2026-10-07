@@ -1,0 +1,1592 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mes Relances</title>
+<style>
+@font-face{font-family:"Bricolage Grotesque";font-weight:500;font-display:swap;src:url("fonts/bricolage-grotesque-latin-500-normal.woff2") format("woff2")}
+@font-face{font-family:"Bricolage Grotesque";font-weight:700;font-display:swap;src:url("fonts/bricolage-grotesque-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Figtree";font-weight:400;font-display:swap;src:url("fonts/figtree-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Figtree";font-weight:500;font-display:swap;src:url("fonts/figtree-latin-500-normal.woff2") format("woff2")}
+@font-face{font-family:"Figtree";font-weight:600;font-display:swap;src:url("fonts/figtree-latin-600-normal.woff2") format("woff2")}
+@font-face{font-family:"IBM Plex Mono";font-weight:500;font-display:swap;src:url("fonts/ibm-plex-mono-latin-500-normal.woff2") format("woff2")}
+/* Layout: sidebar of six work areas on the left, one working column on the right; nav turns into a top strip when narrow. */
+:root{
+  --bg:#F5F6F8; --surface:#FFFFFF; --sunk:#ECEEF2; --line:#DADEE6; --side:#E9ECF3;
+  --fg:#1B2030; --muted:#5E6577; --accent:#2B47C9; --accent-soft:#E3E8FB; --on-accent:#fff;
+  --late:#C2410C; --late-soft:#FDEBDD; --ok:#1F7A4D; --ok-soft:#DDF2E6; --warn:#9A6B00; --warn-soft:#FBF0D2; --no:#7A7F8C; --no-soft:#ECEDF0;
+  --shade:rgb(10 12 20 / .45);
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,"Segoe UI",sans-serif;
+  --body:"Figtree",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12151D; --surface:#1A1E29; --sunk:#232836; --line:#2F3546; --side:#161A24;
+  --fg:#E8EAF0; --muted:#9AA1B2; --accent:#8EA2FF; --accent-soft:#252E55; --on-accent:#10142A;
+  --late:#FF9A62; --late-soft:#3B2318; --ok:#6CD39C; --ok-soft:#173326; --warn:#F2C25B; --warn-soft:#352B12; --no:#9AA1B2; --no-soft:#272B36;
+  --shade:rgb(0 0 0 / .6); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12151D; --surface:#1A1E29; --sunk:#232836; --line:#2F3546; --side:#161A24;
+  --fg:#E8EAF0; --muted:#9AA1B2; --accent:#8EA2FF; --accent-soft:#252E55; --on-accent:#10142A;
+  --late:#FF9A62; --late-soft:#3B2318; --ok:#6CD39C; --ok-soft:#173326; --warn:#F2C25B; --warn-soft:#352B12; --no:#9AA1B2; --no-soft:#272B36;
+  --shade:rgb(0 0 0 / .6); color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 var(--body)}
+[hidden]{display:none!important}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:clamp(1.6rem,3.4vw,2.1rem);font-weight:700}
+h2{font-size:1.15rem;font-weight:700}
+h3{font-size:1rem;font-weight:700}
+p{margin:0}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:.82rem}
+.muted{color:var(--muted)}
+.note{font-size:.85rem;color:var(--muted)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* Shell */
+.app{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:100%}
+.side{background:var(--side);border-right:1px solid var(--line);padding:20px 12px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:1.1rem;padding:0 8px 16px}
+.brand svg{flex:none}
+.nav{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;padding:9px 10px;border-radius:8px;font-weight:600;color:var(--muted);text-align:left}
+.nav svg{flex:none;width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav:hover{background:var(--sunk);color:var(--fg)}
+.nav[aria-current="page"]{background:var(--surface);color:var(--fg);box-shadow:0 0 0 1px var(--line)}
+.nav .lbl{flex:1;min-width:0}
+.badge{font-family:var(--mono);font-size:.72rem;min-width:20px;padding:1px 6px;border-radius:99px;text-align:center;background:var(--late);color:#fff}
+.badge.soft{background:var(--accent-soft);color:var(--accent)}
+.side .spacer{flex:1}
+@media (max-width:860px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .side{position:sticky;top:0;z-index:5;height:auto;flex-direction:row;overflow-x:auto;padding:8px;border-right:0;border-bottom:1px solid var(--line);gap:2px}
+  .brand,.side .spacer{display:none}
+  .nav{width:auto;white-space:nowrap;padding:7px 10px}
+  .nav .lbl{flex:none}
+}
+.view{max-width:1000px;width:100%;margin:0 auto;padding-inline:24px;padding-block:28px 64px;display:grid;gap:22px;align-content:start}
+@media (max-width:560px){.view{padding-inline:16px}}
+.vhead{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+.vhead p{margin-top:4px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* Buttons */
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 14px;font-weight:600;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.small{padding:5px 10px;font-size:.85rem}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--fg);border-color:var(--line)}
+.btn.danger{color:var(--late);border-color:var(--late-soft)}
+.btn.good{color:var(--ok);border-color:var(--ok-soft)}
+
+/* Stats strip */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.stat{background:var(--surface);padding:14px 16px;display:grid;gap:2px;align-content:start}
+.stat b{font-family:var(--display);font-size:1.8rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat span{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+.stat small{font-size:.8rem;color:var(--muted)}
+.stat.hot b{color:var(--late)}
+@media (max-width:620px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--line);align-items:center}
+.tab{border:0;background:none;padding:8px 12px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent)}
+.tab .n{font-family:var(--mono);font-size:.75rem;margin-left:4px;color:var(--muted)}
+.search{margin-left:auto;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);min-width:0;width:200px;max-width:100%}
+
+/* Rows / cards */
+.list{display:grid;gap:8px}
+.group-title{font-size:.75rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700;margin-top:6px}
+.row{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 16px;align-items:center}
+.row.flag{border-left:4px solid var(--late);padding-left:11px}
+.row.flag-ok{border-left:4px solid var(--ok);padding-left:11px}
+.row.flag-acc{border-left:4px solid var(--accent);padding-left:11px}
+.row .main{min-width:0;display:grid;gap:3px}
+.row .title{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.row .title strong{font-size:1.02rem}
+.row .meta{font-size:.88rem;color:var(--muted);display:flex;gap:4px 14px;flex-wrap:wrap}
+.row .side-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.row.dated{grid-template-columns:64px minmax(0,1fr) auto}
+.datebox{border:1px solid var(--line);border-radius:8px;text-align:center;padding:6px 0;background:var(--bg);line-height:1.15}
+.datebox b{display:block;font-family:var(--display);font-size:1.45rem}
+.datebox span{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+@media (max-width:680px){.row,.row.dated{grid-template-columns:minmax(0,1fr)}.row .side-actions{justify-content:flex-start}.row.dated .datebox{width:64px}}
+.when{font-size:.86rem;font-weight:600}
+.late{color:var(--late)} .soon{color:var(--warn)} .fine{color:var(--muted)} .good-t{color:var(--ok)}
+
+.pill{font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:99px;letter-spacing:.02em;white-space:nowrap}
+.p-acc{background:var(--accent-soft);color:var(--accent)}
+.p-neutral{background:var(--sunk);color:var(--fg)}
+.p-warn{background:var(--warn-soft);color:var(--warn)}
+.p-ok{background:var(--ok-soft);color:var(--ok)}
+.p-no{background:var(--no-soft);color:var(--no)}
+.p-late{background:var(--late-soft);color:var(--late)}
+.cat{display:grid;gap:8px}
+.cathead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+.cathead h2{font-size:1.05rem;display:flex;align-items:baseline;gap:8px}
+.sub{display:grid;gap:8px;margin-left:14px;padding-left:14px;border-left:2px solid var(--line)}
+.subhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-top:4px}
+.subhead svg{width:18px;height:18px;fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.6;stroke-linejoin:round;flex:none}
+.subhead h3{font-size:.95rem}
+.subhead .spacer{flex:1}
+@media (max-width:560px){.sub{margin-left:4px;padding-left:10px}}
+.ext{font-family:var(--mono);font-size:.7rem;padding:3px 6px;border-radius:5px;background:var(--sunk);color:var(--muted);text-transform:uppercase}
+
+.empty{border:1px dashed var(--line);border-radius:12px;padding:30px 20px;text-align:center;display:grid;gap:10px;justify-items:center;color:var(--muted)}
+.empty h3{color:var(--fg)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:14px;min-width:0}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:760px){.grid-2{grid-template-columns:minmax(0,1fr)}}
+
+/* Tables */
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.74rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tbody tr:last-child td{border-bottom:0}
+
+/* Chart */
+.chart svg{width:100%;height:auto;display:block}
+.chart .gl{stroke:var(--line);stroke-width:1}
+.chart .ax{fill:var(--muted);font:500 11px var(--mono)}
+.chart .bar{fill:var(--accent)}
+.chart .bar.past{fill:var(--accent);fill-opacity:.45}
+.chart .val{fill:var(--fg);font:600 11px var(--mono)}
+.meter{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--ok);border-radius:99px}
+
+/* Dialogs & forms */
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--fg);padding:0;width:min(600px,calc(100vw - 32px));max-height:calc(100vh - 32px)}
+dialog::backdrop{background:var(--shade)}
+.dlg{display:grid;gap:14px;padding:20px}
+.dlg header{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fgrid .full{grid-column:1/-1}
+@media (max-width:480px){.fgrid{grid-template-columns:1fr}}
+label{display:grid;gap:4px;font-size:.82rem;font-weight:600;color:var(--muted)}
+input,select,textarea{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--bg);font-weight:400;font-size:.95rem;width:100%;min-width:0}
+textarea{resize:vertical;min-height:70px}
+fieldset{border:1px solid var(--line);border-radius:8px;padding:8px 12px 10px;margin:0;display:flex;flex-wrap:wrap;gap:6px 16px}
+legend{font-size:.82rem;font-weight:600;color:var(--muted);padding:0 4px}
+label.check{display:flex;gap:8px;align-items:center;font-weight:500;color:var(--fg);font-size:.9rem}
+label.check input{width:auto;margin:0}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;width:fit-content;max-width:100%}
+.seg button{border:0;background:var(--surface);padding:6px 14px;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.msg{white-space:pre-wrap;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:14px;font-size:.93rem;max-height:46vh;overflow:auto}
+.dest{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:.9rem}
+code.sel{font-family:var(--mono);background:var(--sunk);padding:2px 6px;border-radius:6px;user-select:all;word-break:break-all}
+.foot{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center}
+.hist{font-size:.85rem;color:var(--muted);display:grid;gap:2px;max-height:110px;overflow:auto}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 16px;border-radius:8px;font-weight:600;font-size:.9rem;z-index:20}
+
+/* Report (screen + print) */
+.report{display:grid;gap:14px}
+.report .rhead{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:2px solid var(--fg);padding-bottom:10px}
+.report .rhead dl{display:grid;grid-template-columns:auto auto;gap:2px 12px;margin:0;font-size:.88rem}
+.report dt{color:var(--muted)} .report dd{margin:0;font-weight:600}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:.85rem;background:var(--bg)}
+.chip b{font-family:var(--mono);margin-right:4px}
+#printArea{display:none}
+@media print{
+  html:root:not(.p){--bg:#fff;--surface:#fff;--sunk:#f0f0f0;--line:#cfcfcf;--fg:#000;--muted:#444;--accent:#2B47C9;color-scheme:light}
+  html,body{background:#fff!important;height:auto}
+  .app,dialog,.toast{display:none!important}
+  #printArea{display:block;padding:0}
+  #printArea table{font-size:10.5pt}
+  #printArea tr{break-inside:avoid}
+}
+@media (prefers-reduced-motion:no-preference){.row,.nav{transition:border-color .15s,background-color .15s}}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="side" aria-label="Sections">
+    <div class="brand">
+      <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="7" fill="var(--accent)"/><rect x="6" y="9" width="16" height="11" rx="2" fill="var(--on-accent)"/><path d="M7 10.5l7 5 7-5" stroke="var(--accent)" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Mes Relances
+    </div>
+    <button class="nav" data-view="relances" type="button"><svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="M4 7l8 6 8-6"/></svg><span class="lbl">Relances</span><span class="badge" id="bRel" hidden></span></button>
+    <button class="nav" data-view="prospects" type="button"><svg viewBox="0 0 24 24"><path d="M4 21V5l8-3v19M12 9h8v12M7 8h2M7 12h2M7 16h2M15 13h2M15 17h2M2 21h20"/></svg><span class="lbl">À démarcher</span><span class="badge soft" id="bPro" hidden></span></button>
+    <button class="nav" data-view="entretiens" type="button"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg><span class="lbl">Entretiens</span><span class="badge soft" id="bEnt" hidden></span></button>
+    <button class="nav" data-view="missions" type="button"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5h6v2M3 13h18"/></svg><span class="lbl">Missions</span><span class="badge" id="bMis" hidden></span></button>
+    <button class="nav" data-view="paie" type="button"><svg viewBox="0 0 24 24"><path d="M17 6.5A7 7 0 1 0 17 17.5M4 10h9M4 14h9"/></svg><span class="lbl">Paie</span><span class="badge" id="bPay" hidden></span></button>
+    <button class="nav" data-view="formations" type="button"><svg viewBox="0 0 24 24"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5M22 9v6"/></svg><span class="lbl">Formations</span><span class="badge" id="bFor" hidden></span></button>
+    <button class="nav" data-view="documents" type="button"><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg><span class="lbl">Documents</span><span class="badge" id="bDoc" hidden></span></button>
+    <button class="nav" data-view="stats" type="button"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="lbl">Statistiques</span></button>
+    <button class="nav" data-view="bilan" type="button"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="M9 9l2 2 4-4M9 15h6"/></svg><span class="lbl">Bilan France Travail</span></button>
+    <div class="spacer"></div>
+    <button class="nav" id="btnTheme" type="button"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/></svg><span class="lbl" id="themeLbl">Thème : auto</span></button>
+    <button class="nav" id="btnSettings" type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><span class="lbl">Réglages</span><span class="badge" id="bSet" hidden>!</span></button>
+  </nav>
+
+  <main>
+    <!-- RELANCES -->
+    <section class="view" id="v-relances">
+      <div class="vhead">
+        <div><h1>Mes relances</h1><p class="muted" id="today"></p></div>
+        <div class="actions"><button class="btn primary" id="btnAddC" type="button">+ Ajouter une agence ou entreprise</button></div>
+      </div>
+      <div class="stats">
+        <div class="stat hot"><b id="stDue">0</b><span>À relancer</span></div>
+        <div class="stat"><b id="stWait">0</b><span>En attente</span></div>
+        <div class="stat"><b id="stInt">0</b><span>Entretiens</span></div>
+        <div class="stat"><b id="stOff">0</b><span>Offres / missions</span></div>
+      </div>
+      <div style="display:grid;gap:12px">
+        <div class="tabs" role="tablist" id="relTabs">
+          <button class="tab" role="tab" data-f="due" aria-selected="true" type="button">À relancer<span class="n" id="nDue"></span></button>
+          <button class="tab" role="tab" data-f="all" aria-selected="false" type="button">Tout<span class="n" id="nAll"></span></button>
+          <button class="tab" role="tab" data-f="interim" aria-selected="false" type="button">Intérim<span class="n" id="nIn"></span></button>
+          <button class="tab" role="tab" data-f="entreprise" aria-selected="false" type="button">Entreprises<span class="n" id="nEn"></span></button>
+          <button class="tab" role="tab" data-f="closed" aria-selected="false" type="button">Clôturées<span class="n" id="nCl"></span></button>
+          <input class="search" id="q" type="search" placeholder="Rechercher…" aria-label="Rechercher">
+        </div>
+        <div class="list" id="relList"></div>
+      </div>
+    </section>
+
+    <!-- ENTRETIENS -->
+    <section class="view" id="v-entretiens" hidden>
+      <div class="vhead">
+        <div><h1>Entretiens</h1><p class="muted">Un rappel Windows vous prévient la veille et le jour même.</p></div>
+        <div class="actions"><button class="btn primary" id="btnAddE" type="button">+ Ajouter un entretien</button></div>
+      </div>
+      <div class="list" id="entList"></div>
+    </section>
+
+    <!-- MISSIONS -->
+    <section class="view" id="v-missions" hidden>
+      <div class="vhead">
+        <div><h1>Missions d'intérim</h1><p class="muted">3 jours avant la fin d'une mission, le logiciel vous rappelle de prévenir l'agence.</p></div>
+        <div class="actions"><button class="btn primary" id="btnAddM" type="button">+ Ajouter une mission</button></div>
+      </div>
+      <div class="list" id="misList"></div>
+    </section>
+
+    <!-- À DÉMARCHER -->
+    <section class="view" id="v-prospects" hidden>
+      <div class="vhead">
+        <div><h1>Entreprises à démarcher</h1><p class="muted">Votre carnet d'entreprises à contacter. « J'ai candidaté » les fait passer dans vos relances.</p></div>
+        <div class="actions"><button class="btn" id="btnImportP" type="button">Importer un tableau Excel</button><button class="btn primary" id="btnAddP" type="button">+ Ajouter une entreprise</button></div>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="psTodo">0</b><span>À démarcher</span></div>
+        <div class="stat"><b id="psHigh">0</b><span>Priorité haute</span></div>
+        <div class="stat"><b id="psDone">0</b><span>Candidatures envoyées</span></div>
+        <div class="stat"><b id="psNo">0</b><span>Pas intéressé</span></div>
+      </div>
+      <div style="display:grid;gap:12px">
+        <div class="tabs" role="tablist" id="prosTabs">
+          <button class="tab" role="tab" data-f="a_faire" aria-selected="true" type="button">À démarcher<span class="n"></span></button>
+          <button class="tab" role="tab" data-f="candidate" aria-selected="false" type="button">Candidature envoyée<span class="n"></span></button>
+          <button class="tab" role="tab" data-f="non" aria-selected="false" type="button">Pas intéressé<span class="n"></span></button>
+          <button class="tab" role="tab" data-f="all" aria-selected="false" type="button">Tout<span class="n"></span></button>
+          <input class="search" id="qP" type="search" placeholder="Nom, ville, secteur…" aria-label="Rechercher">
+        </div>
+        <div class="list" id="prosList"></div>
+      </div>
+    </section>
+
+    <!-- PAIE -->
+    <section class="view" id="v-paie" hidden>
+      <div class="vhead">
+        <div><h1>Fiches de paie</h1><p class="muted">Vérifiez que toutes vos heures sont payées, ainsi que l'indemnité de fin de mission et les congés payés.</p></div>
+        <div class="actions"><button class="btn primary" id="btnAddPay" type="button">+ Ajouter une fiche de paie</button></div>
+      </div>
+      <div id="paieBody" style="display:grid;gap:18px"></div>
+    </section>
+
+    <!-- FORMATIONS -->
+    <section class="view" id="v-formations" hidden>
+      <div class="vhead">
+        <div><h1>Formations et habilitations</h1><p class="muted">CACES, soudure, permis, SST… avec un rappel 2 mois avant le recyclage.</p></div>
+        <div class="actions"><button class="btn primary" id="btnAddF" type="button">+ Ajouter</button></div>
+      </div>
+      <div class="list" id="forList"></div>
+    </section>
+
+    <!-- DOCUMENTS -->
+    <section class="view" id="v-documents" hidden>
+      <div class="vhead">
+        <div><h1>Mes documents</h1><p class="muted">Une copie de chaque fichier est gardée dans le logiciel. Cochez-les dans une candidature pour savoir qui a reçu quoi.</p></div>
+        <div class="actions"><button class="btn" id="btnAddSub" type="button">+ Créer une sous-catégorie</button><button class="btn primary" id="btnAddD" type="button">+ Ajouter un document</button></div>
+      </div>
+      <div class="list" id="docList"></div>
+    </section>
+
+    <!-- STATS -->
+    <section class="view" id="v-stats" hidden>
+      <div class="vhead"><div><h1>Statistiques</h1><p class="muted">Ce que donnent vos démarches, semaine après semaine.</p></div></div>
+      <div id="statsBody" style="display:grid;gap:18px"></div>
+    </section>
+
+    <!-- BILAN -->
+    <section class="view" id="v-bilan" hidden>
+      <div class="vhead">
+        <div><h1>Bilan France Travail</h1><p class="muted">La liste de vos démarches du mois, à présenter à votre conseiller ou pour l'actualisation.</p></div>
+        <div class="actions">
+          <label style="display:flex;align-items:center;gap:8px">Mois <input id="ftMonth" type="month" style="width:auto"></label>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="ftPdf" type="button">Enregistrer en PDF</button>
+        <button class="btn" id="ftCopy" type="button">Copier le texte</button>
+        <button class="btn" id="ftCsv" type="button">Exporter pour Excel</button>
+      </div>
+      <div class="panel" id="ftReport"></div>
+    </section>
+  </main>
+</div>
+
+<div id="printArea"></div>
+<datalist id="dlAgences"></datalist>
+<datalist id="dlSecteurs"></datalist>
+
+<!-- Formulaire générique -->
+<dialog id="dlgForm">
+  <form class="dlg" id="form" novalidate>
+    <header><h2 id="formTitle"></h2><button class="btn ghost small" type="button" data-close>Fermer</button></header>
+    <div class="fgrid" id="formBody"></div>
+    <div class="hist" id="formHist"></div>
+    <div class="foot">
+      <div>
+        <button class="btn danger small" type="button" id="btnDel" hidden>Supprimer</button>
+        <span id="delConfirm" hidden><span class="note">Supprimer définitivement ?</span> <button class="btn danger small" type="button" id="btnDelYes">Oui, supprimer</button> <button class="btn small" type="button" id="btnDelNo">Annuler</button></span>
+      </div>
+      <button class="btn primary" type="submit" id="btnSave">Enregistrer</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Message -->
+<dialog id="dlgMsg">
+  <div class="dlg">
+    <header><h2 id="msgTitle"></h2><button class="btn ghost small" type="button" data-close>Fermer</button></header>
+    <div class="seg" role="group" aria-label="Canal" id="msgSeg"></div>
+    <div class="dest" id="msgDest"></div>
+    <div class="msg" id="msgBody"></div>
+    <div class="foot">
+      <div class="actions"><button class="btn" type="button" id="btnCopy">Copier le message</button>
+        <button class="btn" type="button" id="btnMail" hidden>Ouvrir dans ma messagerie</button></div>
+      <button class="btn primary" type="button" id="btnMsgDone"></button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Réglages -->
+<dialog id="dlgSet">
+  <form class="dlg" id="formSet">
+    <header><h2>Réglages</h2><button class="btn ghost small" type="button" data-close>Fermer</button></header>
+    <p class="note">Ces informations signent vos messages et figurent en tête du bilan France Travail.</p>
+    <div class="fgrid">
+      <label>Prénom et nom<input id="sNom" placeholder="Ex. Camille Durand"></label>
+      <label>Téléphone<input id="sTel" type="tel" placeholder="06 12 34 56 78"></label>
+      <label>Email<input id="sEmail" type="email" placeholder="vous@exemple.fr"></label>
+      <label>Identifiant France Travail<input id="sFT" placeholder="Ex. 1234567A"></label>
+      <label>Relancer une agence d'intérim tous les (jours)<input id="sDInt" type="number" min="1" max="60"></label>
+      <label>Relancer une entreprise après (jours)<input id="sDEnt" type="number" min="1" max="60"></label>
+      <label>Apparence
+        <select id="sTheme"><option value="auto">Comme Windows</option><option value="light">Clair</option><option value="dark">Sombre</option></select>
+      </label>
+    </div>
+    <label class="check"><input id="sAuto" type="checkbox"> Ouvrir Mes Relances au démarrage de Windows (pour recevoir les rappels chaque matin)</label>
+    <div style="display:grid;gap:10px;border-top:1px solid var(--line);padding-top:14px">
+      <h3>Sauvegarde automatique</h3>
+      <label class="check"><input id="bkOn" type="checkbox"> Sauvegarder automatiquement mes données et mes documents</label>
+      <div style="display:grid;gap:4px"><span class="note" style="font-weight:600">Dossier de sauvegarde (une clé USB ou un disque externe, c'est le plus sûr)</span>
+        <div class="actions"><code class="sel" id="bkDir" style="flex:1;min-width:0"></code><button class="btn small" type="button" id="bkPick">Choisir…</button></div></div>
+      <div class="fgrid">
+        <label>Fréquence<select id="bkFreq"><option value="jour">Chaque jour</option><option value="semaine">Chaque semaine</option></select></label>
+        <label>Nombre de copies à garder<input id="bkKeep" type="number" min="1" max="100"></label>
+      </div>
+      <p class="note" id="bkStatus"></p>
+      <div class="actions">
+        <button class="btn small primary" type="button" id="bkNow">Sauvegarder maintenant</button>
+        <button class="btn small" type="button" id="bkOpen">Ouvrir le dossier</button>
+        <button class="btn small" type="button" id="bkRestore">Restaurer une sauvegarde…</button>
+      </div>
+    </div>
+    <div style="display:grid;gap:8px;border-top:1px solid var(--line);padding-top:14px">
+      <h3>Exports</h3>
+      <div class="actions">
+        <button class="btn small" type="button" id="btnExport">Exporter une sauvegarde</button>
+        <button class="btn small" type="button" id="btnImport">Importer une sauvegarde</button>
+        <button class="btn small" type="button" id="btnCsv">Exporter les candidatures pour Excel</button>
+      </div>
+      <p class="note">Vos données et vos documents sont enregistrés sur ce PC, dans :<br><code class="sel" id="sPath"></code></p>
+    </div>
+    <div class="foot"><span></span><button class="btn primary" type="submit">Enregistrer</button></div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(() => {
+  // ---------- Utilitaires ----------
+  const $ = s => document.querySelector(s);
+  const $$ = s => [...document.querySelectorAll(s)];
+  const pad = n => String(n).padStart(2,'0');
+  const iso = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const todayISO = () => iso(new Date());
+  const parse = s => { const [y,m,d] = (s||'').split('-').map(Number); return y ? new Date(y,m-1,d) : null; };
+  const addDays = (s,n) => { const d = parse(s) || new Date(); d.setDate(d.getDate()+n); return iso(d); };
+  const diffDays = (a,b) => Math.round((parse(a)-parse(b))/86400000);
+  const frDate = s => { const d = parse(s); return d ? d.toLocaleDateString('fr-FR',{day:'numeric',month:'long'}) : ''; };
+  const frDay = s => { const d = parse(s); return d ? d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}) : ''; };
+  const shortDate = s => { const d = parse(s); return d ? `${pad(d.getDate())}/${pad(d.getMonth()+1)}` : '—'; };
+  const fullDate = s => { const d = parse(s); return d ? `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}` : ''; };
+  const hhmm = h => h ? h.replace(':','h') : '';
+  const monday = s => { const d = parse(s); d.setDate(d.getDate() - ((d.getDay()+6)%7)); return iso(d); };
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const uid = () => (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
+  const euro = n => (Math.round(n*100)/100).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' €';
+  const plural = (n, w, ws) => `${n} ${n>1 ? (ws||w+'s') : w}`;
+  const toast = t => { const el = $('#toast'); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(()=> el.hidden = true, 2400); };
+
+  const STATUT = {attente:'En attente', entretien:'Entretien', offre:'Offre / mission', refus:'Refus'};
+  const STATUT_PILL = {attente:'p-warn', entretien:'p-acc', offre:'p-ok', refus:'p-no'};
+  const OPEN = new Set(['attente','entretien']);
+  const CANAL = {email:'Email', sms:'SMS', tel:'Téléphone'};
+  const ENT_TYPES = [['Sur place','Sur place'],['Téléphone','Téléphone'],['Visio','Visio']];
+  const RESULT = {prevu:'En attente de réponse', positif:'Positif', negatif:'Négatif'};
+  const DOC_CATS = ['CV','Lettre de motivation','Diplôme / formation','Permis / CACES / habilitation','Pièce d\'identité','Attestation','Autre'];
+
+  // ---------- État ----------
+  const COLLS = ['contacts','entretiens','missions','documents','paies','prospects','formations'];
+  const S = { contacts:[], entretiens:[], missions:[], documents:[], paies:[], prospects:[], formations:[], settings:{nom:'',tel:'',email:'',idFT:'',delaiInterim:4,delaiEntreprise:7,theme:'auto',docSubcats:{},backup:{enabled:false,dir:'',freq:'semaine',keep:10}} };
+  let view = 'relances', relFilter = 'due', query = '';
+  const delayFor = type => Number(type === 'interim' ? S.settings.delaiInterim : S.settings.delaiEntreprise) || 7;
+  const isDue = c => OPEN.has(c.statut) && c.prochaineRelance && c.prochaineRelance <= todayISO();
+  const missionState = m => { const t = todayISO(); if (m.debut && m.debut > t) return 'avenir'; if (m.fin && m.fin < t) return 'finie'; return 'encours'; };
+  const missionAlert = m => missionState(m) === 'encours' && m.fin && !m.agenceRelancee && diffDays(m.fin, todayISO()) <= 3;
+  const docExpiring = d => d.expiration && diffDays(d.expiration, todayISO()) <= 30;
+
+  async function persist(){
+    try { const out = {settings:S.settings}; COLLS.forEach(k => out[k] = S[k]); await window.api.save(out); }
+    catch { toast("Échec de l'enregistrement"); }
+    renderAll();
+    window.api.checkReminders().catch(()=>{});
+  }
+  async function upsert(coll, obj){ const i = S[coll].findIndex(x => x.id === obj.id); if (i < 0) S[coll].push(obj); else S[coll][i] = obj; await persist(); }
+  async function removeItem(coll, id){ S[coll] = S[coll].filter(x => x.id !== id); await persist(); }
+  const find = (coll, id) => S[coll].find(x => x.id === id);
+
+  // ---------- Navigation ----------
+  function go(v){
+    view = v;
+    $$('.nav[data-view]').forEach(b => { if (b.dataset.view === v) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
+    $$('main > .view').forEach(s => s.hidden = s.id !== 'v-' + v);
+    renderAll();
+    $('main').scrollTop = 0; window.scrollTo(0,0);
+  }
+  $$('.nav[data-view]').forEach(b => b.addEventListener('click', () => go(b.dataset.view)));
+
+  function renderBadges(){
+    const set = (id, n) => { const el = $(id); el.hidden = !n; el.textContent = n; };
+    set('#bRel', S.contacts.filter(isDue).length);
+    const t = todayISO(), wk = addDays(t, 7);
+    set('#bEnt', S.entretiens.filter(e => e.date >= t && e.date <= wk).length);
+    set('#bMis', S.missions.filter(missionAlert).length);
+    set('#bDoc', S.documents.filter(docExpiring).length);
+    set('#bPro', S.prospects.filter(p => p.statut === 'a_faire' && p.priorite === '1').length);
+    set('#bFor', S.formations.filter(forRenew).length);
+    set('#bPay', S.paies.filter(p => slipIssues(p).length).length + S.missions.filter(m => { const mp = missionPay(m); return mp && mp.issues.some(i => !/non payées/.test(i)); }).length);
+  }
+  function renderAll(){
+    renderBadges();
+    ({relances:renderRelances, prospects:renderProspects, entretiens:renderEntretiens, missions:renderMissions, paie:renderPaie, formations:renderFormations, documents:renderDocuments, stats:renderStats, bilan:renderBilan})[view]();
+    $('#dlAgences').innerHTML = [...new Set([...S.contacts.filter(c=>c.type==='interim').map(c=>c.nom), ...S.missions.map(m=>m.agence)].filter(Boolean))].map(n=>`<option value="${esc(n)}">`).join('');
+  }
+
+  // ---------- Formulaire générique ----------
+  let F = null;
+  function fieldHtml(f, v){
+    const id = 'f_' + f.k, cls = f.full ? 'full' : '';
+    const val = v ?? f.def ?? '';
+    if (f.type === 'select') return `<label class="${cls}">${f.label}<select id="${id}">${f.options.map(([o,l]) => `<option value="${esc(o)}" ${String(val)===String(o)?'selected':''}>${esc(l)}</option>`).join('')}</select></label>`;
+    if (f.type === 'textarea') return `<label class="full">${f.label}<textarea id="${id}" placeholder="${esc(f.ph||'')}">${esc(val)}</textarea></label>`;
+    if (f.type === 'checks') return `<fieldset class="full"><legend>${f.label}</legend>${f.options.length ? f.options.map(([o,l]) => `<label class="check"><input type="checkbox" data-k="${f.k}" value="${esc(o)}" ${(v||[]).includes(o)?'checked':''}> ${esc(l)}</label>`).join('') : `<span class="note">${f.empty||''}</span>`}</fieldset>`;
+    if (f.type === 'info') return `<div class="full note">${f.html}</div>`;
+    return `<label class="${cls}">${f.label}<input id="${id}" type="${f.type||'text'}" ${f.step?`step="${f.step}"`:''} ${f.min!=null?`min="${f.min}"`:''} ${f.list?`list="${f.list}"`:''} placeholder="${esc(f.ph||'')}" value="${esc(val)}"></label>`;
+  }
+  function readForm(){
+    const o = {};
+    for (const f of F.fields) {
+      if (f.type === 'info') continue;
+      if (f.type === 'checks') { o[f.k] = $$(`#formBody input[data-k="${f.k}"]:checked`).map(i => i.value); continue; }
+      const el = $('#f_' + f.k); if (!el) continue;
+      o[f.k] = f.type === 'number' ? (el.value === '' ? '' : Number(el.value)) : el.value.trim();
+    }
+    return o;
+  }
+  const setField = (k, v) => { const el = $('#f_' + k); if (el) el.value = v ?? ''; };
+  function openForm(cfg){
+    F = cfg;
+    $('#formTitle').textContent = cfg.title;
+    $('#formBody').innerHTML = cfg.fields.map(f => fieldHtml(f, (cfg.values||{})[f.k])).join('');
+    $('#formHist').innerHTML = cfg.hist || '';
+    $('#btnDel').hidden = !cfg.onDelete; $('#delConfirm').hidden = true;
+    $('#btnSave').textContent = cfg.saveLabel || 'Enregistrer';
+    $('#dlgForm').showModal();
+    setTimeout(() => { const first = $('#formBody input:not([type=checkbox]), #formBody select'); first && first.focus(); }, 30);
+  }
+  $('#formBody').addEventListener('input', e => { if (F?.onChange && e.target.id) F.onChange(e.target.id.slice(2), readForm(), setField); });
+  $('#formBody').addEventListener('change', e => { if (F?.onChange && e.target.id && e.target.tagName === 'SELECT') F.onChange(e.target.id.slice(2), readForm(), setField); });
+  $('#form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const vals = readForm();
+    const missing = F.fields.filter(f => f.required && !vals[f.k]);
+    if (missing.length) { toast(`Renseignez : ${missing.map(f=>f.label.toLowerCase()).join(', ')}`); $('#f_' + missing[0].k)?.focus(); return; }
+    const ok = await F.onSave(vals);
+    if (ok !== false) { F.saved = true; $('#dlgForm').close(); }
+  });
+  $('#dlgForm').addEventListener('close', () => { if (F && !F.saved && F.onCancel) F.onCancel(); });
+  $('#btnDel').addEventListener('click', () => { $('#btnDel').hidden = true; $('#delConfirm').hidden = false; });
+  $('#btnDelNo').addEventListener('click', () => { $('#btnDel').hidden = false; $('#delConfirm').hidden = true; });
+  $('#btnDelYes').addEventListener('click', async () => { F.saved = true; await F.onDelete(); $('#dlgForm').close(); toast('Supprimé'); });
+  $$('[data-close]').forEach(b => b.addEventListener('click', () => b.closest('dialog').close()));
+
+  // ---------- Message générique ----------
+  let M = null, mCh = null;
+  function openMsg(cfg){ M = cfg; mCh = cfg.start || Object.keys(cfg.channels)[0]; renderMsg(); $('#dlgMsg').showModal(); }
+  function renderMsg(){
+    const chs = Object.keys(M.channels);
+    $('#msgTitle').textContent = M.title;
+    $('#msgSeg').hidden = chs.length < 2;
+    $('#msgSeg').innerHTML = chs.map(c => `<button type="button" data-ch="${c}" aria-pressed="${c===mCh}">${({email:'Email',sms:'SMS',tel:'Appel'})[c]}</button>`).join('');
+    const ch = M.channels[mCh];
+    $('#msgDest').innerHTML = ch.dest
+      ? `<span class="muted">${mCh==='email'?'Email :':'Numéro :'}</span><code class="sel">${esc(ch.dest)}</code><button class="btn small" type="button" id="btnCopyDest">Copier</button>`
+      : `<span class="note">${mCh==='email'?'Pas d\'email enregistré':'Pas de numéro enregistré'} pour ce contact. Ajoutez-le via « Modifier ».</span>`;
+    $('#msgBody').textContent = ch.text;
+    $('#btnCopy').hidden = mCh === 'tel';
+    $('#btnMail').hidden = !(mCh === 'email' && ch.dest);
+    $('#btnMsgDone').hidden = !M.onDone;
+    $('#btnMsgDone').textContent = M.doneLabel || 'Fait ✓';
+  }
+  $('#msgSeg').addEventListener('click', e => { const b = e.target.closest('[data-ch]'); if (b) { mCh = b.dataset.ch; renderMsg(); } });
+  async function copyText(text, el){
+    try { await navigator.clipboard.writeText(text); toast('Copié'); }
+    catch { if (el) { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } toast('Sélectionné : faites Ctrl+C'); }
+  }
+  $('#msgDest').addEventListener('click', e => { if (e.target.id === 'btnCopyDest') copyText(M.channels[mCh].dest); });
+  $('#btnCopy').addEventListener('click', () => copyText($('#msgBody').textContent, $('#msgBody')));
+  $('#btnMail').addEventListener('click', () => {
+    const ch = M.channels[mCh]; const m = ch.text.match(/^Objet : (.*)\n\n([\s\S]*)$/);
+    window.api.openExternal(`mailto:${encodeURIComponent(ch.dest)}?subject=${encodeURIComponent(m?m[1]:'')}&body=${encodeURIComponent(m?m[2]:ch.text)}`);
+  });
+  $('#btnMsgDone').addEventListener('click', async () => { const cfg = M, ch = mCh; $('#dlgMsg').close(); await cfg.onDone(ch); });
+
+  const moi = () => S.settings.nom || '[Votre nom]';
+  const montel = () => S.settings.tel || '[Votre téléphone]';
+  const signature = () => [moi(), S.settings.tel, S.settings.email].filter(Boolean).join('\n');
+
+  // =====================================================================
+  // RELANCES
+  // =====================================================================
+  function whenLabel(c){
+    if (!OPEN.has(c.statut)) return {cls:'fine', txt: c.statut === 'offre' ? 'Clôturée : bravo !' : 'Clôturée'};
+    if (!c.prochaineRelance) return {cls:'fine', txt:'Pas de relance prévue'};
+    const d = diffDays(c.prochaineRelance, todayISO());
+    if (d < 0) return {cls:'late', txt:`Relance en retard de ${d*-1} j`};
+    if (d === 0) return {cls:'late', txt:"Relancer aujourd'hui"};
+    if (d <= 2) return {cls:'soon', txt: d === 1 ? 'Relancer demain' : 'Relancer dans 2 j'};
+    return {cls:'fine', txt:`Relance le ${shortDate(c.prochaineRelance)}`};
+  }
+  function renderRelances(){
+    const items = S.contacts, open = items.filter(i => OPEN.has(i.statut)), due = items.filter(isDue);
+    $('#stDue').textContent = due.length;
+    $('#stWait').textContent = items.filter(i=>i.statut==='attente').length;
+    $('#stInt').textContent = items.filter(i=>i.statut==='entretien').length;
+    $('#stOff').textContent = items.filter(i=>i.statut==='offre').length;
+    $('#nDue').textContent = due.length; $('#nAll').textContent = items.length;
+    $('#nIn').textContent = open.filter(i=>i.type==='interim').length;
+    $('#nEn').textContent = open.filter(i=>i.type==='entreprise').length;
+    $('#nCl').textContent = items.length - open.length;
+    let list = items;
+    if (relFilter === 'due') list = due;
+    else if (relFilter === 'interim') list = open.filter(i=>i.type==='interim');
+    else if (relFilter === 'entreprise') list = open.filter(i=>i.type==='entreprise');
+    else if (relFilter === 'closed') list = items.filter(i=>!OPEN.has(i.statut));
+    if (query) { const q = query.toLowerCase(); list = list.filter(i => [i.nom,i.poste,i.contact,i.ville,i.notes].join(' ').toLowerCase().includes(q)); }
+    list = [...list].sort((a,b) => (OPEN.has(b.statut) - OPEN.has(a.statut)) || String(a.prochaineRelance||'9999').localeCompare(String(b.prochaineRelance||'9999')));
+    const box = $('#relList');
+    if (!items.length) { box.innerHTML = `<div class="empty"><h3>Aucune candidature pour l'instant</h3><p>Ajoutez une agence d'intérim où vous êtes inscrit·e ou une entreprise à qui vous avez écrit. Le logiciel calcule la date de relance pour vous.</p><button class="btn primary" type="button" data-act="addC">+ Ajouter la première</button></div>`; return; }
+    if (!list.length) { box.innerHTML = `<div class="empty"><h3>${relFilter==='due' ? "Rien à relancer aujourd'hui" : 'Aucun résultat'}</h3><p>${relFilter==='due' ? 'Vos relances sont à jour. Consultez l\'onglet « Tout » pour voir les prochaines.' : 'Essayez un autre filtre ou une autre recherche.'}</p></div>`; return; }
+    box.innerHTML = list.map(c => {
+      const w = whenLabel(c);
+      const since = c.derniereAction ? diffDays(todayISO(), c.derniereAction) : null;
+      const nDocs = (c.docs||[]).filter(id => find('documents', id)).length;
+      return `<article class="row ${isDue(c)?'flag':''}">
+        <div class="main">
+          <div class="title"><strong>${esc(c.nom)}</strong>
+            <span class="pill ${c.type==='interim'?'p-acc':'p-neutral'}">${c.type==='interim'?'Intérim':'Entreprise'}</span>
+            <span class="pill ${STATUT_PILL[c.statut]||''}">${STATUT[c.statut]||''}</span></div>
+          <div class="meta">${c.poste?`<span>${esc(c.poste)}</span>`:''}${c.contact?`<span>${esc(c.contact)}</span>`:''}${c.ville?`<span>${esc(c.ville)}</span>`:''}
+            <span class="mono">Envoyé ${shortDate(c.dateCandidature)}</span>
+            <span class="mono">${plural(c.nbRelances||0,'relance')}${since!==null?` · dernier contact il y a ${since} j`:''}</span>
+            ${nDocs?`<span>${plural(nDocs,'document envoyé','documents envoyés')}</span>`:''}</div>
+          <div class="when ${w.cls}">${w.txt}</div>
+        </div>
+        <div class="side-actions">
+          ${OPEN.has(c.statut)?`<button class="btn small" type="button" data-act="msgC" data-id="${c.id}">Message</button>
+          <button class="btn small primary" type="button" data-act="doneC" data-id="${c.id}">J'ai relancé ✓</button>
+          <button class="btn small" type="button" data-act="entC" data-id="${c.id}">+ Entretien</button>`:''}
+          <button class="btn small ghost" type="button" data-act="editC" data-id="${c.id}">Modifier</button>
+        </div></article>`;
+    }).join('');
+  }
+  $('#relTabs').addEventListener('click', e => { const t = e.target.closest('.tab'); if (!t) return; relFilter = t.dataset.f; $$('#relTabs .tab').forEach(x => x.setAttribute('aria-selected', x === t)); renderRelances(); });
+  $('#q').addEventListener('input', e => { query = e.target.value.trim(); renderRelances(); });
+
+  function relanceText(c, ch){
+    const bonjour = c.contact ? `Bonjour ${c.contact},` : 'Bonjour,';
+    const poste = c.poste || (c.type==='interim' ? 'missions' : 'poste');
+    const date = frDate(c.dateCandidature), n = (c.nbRelances||0) + 1, ville = c.ville ? ` sur ${c.ville}` : '';
+    if (ch === 'tel') return c.type==='interim'
+      ? `Bonjour, ${moi()} à l'appareil. Je suis inscrit·e chez vous depuis le ${date} pour des missions de ${poste}.\n\nJe vous appelle pour vous dire que je suis toujours disponible, immédiatement${ville}.\n\n→ Avez-vous des missions en ce moment qui pourraient me correspondre ?\n→ Mon dossier est-il complet ? (CV, pièces, habilitations)\n→ Quel est le meilleur moment pour vous rappeler ?\n\nNotez le nom de la personne et ce qu'elle vous dit dans les notes.`
+      : `Bonjour, ${moi()} à l'appareil. Je vous ai adressé ma candidature le ${date} pour le poste « ${poste} ».\n\nJe souhaitais savoir si vous aviez bien reçu mon dossier et où en était le recrutement.\n\n→ Le poste est-il toujours ouvert ?\n→ Quelles sont les prochaines étapes ?\n→ Puis-je vous apporter un complément (références, disponibilités) ?\n\nNotez le nom de la personne et ce qu'elle vous dit dans les notes.`;
+    if (ch === 'sms') return c.type==='interim'
+      ? `${bonjour} c'est ${moi()}, inscrit·e chez vous depuis le ${date} pour des missions de ${poste}. Je suis toujours disponible immédiatement${ville}. Avez-vous quelque chose pour moi cette semaine ? Merci beaucoup !`
+      : `${bonjour} je suis ${moi()}, je vous ai envoyé ma candidature le ${date} pour le poste « ${poste} ». Le poste m'intéresse toujours beaucoup : pourriez-vous me dire où en est le recrutement ? Merci et bonne journée.`;
+    if (c.type === 'interim') return n === 1
+      ? `Objet : Disponibilité pour des missions de ${poste} – ${moi()}\n\n${bonjour}\n\nJe me suis inscrit·e dans votre agence le ${date} pour des missions de ${poste}. Je me permets de revenir vers vous pour vous confirmer que je suis toujours disponible, immédiatement${ville}.\n\nSi une mission correspond à mon profil, je peux me rendre disponible rapidement. Je peux aussi passer à l'agence ou vous envoyer un CV à jour si besoin.\n\nBien cordialement,\n${signature()}`
+      : `Objet : Toujours disponible – ${moi()}\n\n${bonjour}\n\nJe reviens vers vous pour faire le point : je reste disponible pour des missions de ${poste}${ville}, y compris de courte durée ou au pied levé.\n\nN'hésitez pas à m'appeler au ${montel()}, je réponds rapidement.\n\nBien cordialement,\n${signature()}`;
+    return n === 1
+      ? `Objet : Suivi de ma candidature – ${poste}\n\n${bonjour}\n\nLe ${date}, je vous ai adressé ma candidature pour le poste « ${poste} ». Je me permets de revenir vers vous, car ce poste m'intéresse toujours vivement.\n\nPourriez-vous m'indiquer où en est le processus de recrutement ? Je serais ravi·e d'échanger avec vous à votre convenance, par téléphone ou lors d'un entretien.\n\nJe vous remercie par avance pour votre retour.\n\nCordialement,\n${signature()}`
+      : `Objet : Ma candidature – ${poste}\n\n${bonjour}\n\nJe reviens vers vous au sujet de ma candidature du ${date} pour le poste « ${poste} ». Je n'ai pas encore eu de retour et reste très motivé·e par cette opportunité.\n\nSi le poste est pourvu, un simple mot de votre part me permettrait de le savoir. S'il est toujours ouvert, je suis disponible pour un échange quand vous le souhaitez.\n\nCordialement,\n${signature()}`;
+  }
+  async function markRelance(c, canal){
+    const n = (c.nbRelances||0)+1, t = todayISO();
+    const next = addDays(t, delayFor(c.type));
+    await upsert('contacts', {...c, nbRelances:n, derniereAction:t, prochaineRelance:next,
+      historique:[...(c.historique||[]), {date:t, action:`Relance n°${n}`, ...(canal?{canal}:{})}].slice(-60)});
+    toast(`Relance notée. Prochaine le ${shortDate(next)}`);
+  }
+  function contactForm(c, prefill, afterSave){
+    const isNew = !c;
+    const docs = S.documents.map(d => [d.id, d.sous ? `${d.nom} (${d.sous})` : d.nom]);
+    openForm({
+      title: isNew ? 'Nouvelle candidature' : 'Modifier la candidature',
+      values: c || (pf => ({dateCandidature:todayISO(), statut:'attente', ...pf, prochaineRelance:addDays(todayISO(), delayFor(pf.type))}))({type:'interim', ...(prefill||{})}),
+      fields: [
+        {k:'type', label:'Type', type:'select', options:[['interim',"Agence d'intérim"],['entreprise','Entreprise']]},
+        {k:'nom', label:"Nom de l'agence / entreprise", required:true, ph:'Ex. Adecco Paris 11e'},
+        {k:'poste', label:'Poste visé', ph:'Ex. Préparateur de commandes'},
+        {k:'contact', label:'Interlocuteur', ph:'Ex. Mme Martin'},
+        {k:'ville', label:'Ville', ph:'Ex. Paris'},
+        {k:'email', label:'Email', type:'email', ph:'contact@…'},
+        {k:'tel', label:'Téléphone', type:'tel', ph:'01 23 45 67 89'},
+        {k:'statut', label:'Statut', type:'select', options:Object.entries({attente:'En attente de réponse', entretien:'Entretien prévu / passé', offre:'Offre ou mission obtenue', refus:'Refus'})},
+        {k:'dateCandidature', label:'Date de candidature / inscription', type:'date', required:true},
+        {k:'prochaineRelance', label:'Prochaine relance', type:'date'},
+        {k:'docs', label:'Documents envoyés', type:'checks', options:docs, empty:'Ajoutez vos CV et lettres dans « Documents » pour pouvoir les cocher ici.'},
+        {k:'notes', label:'Notes', type:'textarea', ph:'Ce qui a été dit, documents envoyés…'}
+      ],
+      hist: c ? (c.historique||[]).slice().reverse().map(h => `<span><span class="mono">${shortDate(h.date)}</span> · ${esc(h.action)}${h.canal?` (${CANAL[h.canal]})`:''}</span>`).join('') : '',
+      onChange: (k, v, set) => { if (isNew && (k === 'type' || k === 'dateCandidature')) set('prochaineRelance', addDays(v.dateCandidature || todayISO(), delayFor(v.type))); },
+      onSave: async v => {
+        const newId = uid();
+        if (isNew) await upsert('contacts', {id:newId, ...v, nbRelances:0, derniereAction:v.dateCandidature,
+          historique:[{date:v.dateCandidature, action: v.type==='interim' ? 'Inscription en agence' : 'Candidature envoyée'}]});
+        if (isNew && afterSave) await afterSave(newId);
+        else await upsert('contacts', {...c, ...v});
+        toast(isNew ? 'Ajouté' : 'Modifications enregistrées');
+      },
+      onDelete: c ? async () => removeItem('contacts', c.id) : null
+    });
+  }
+  $('#btnAddC').addEventListener('click', () => contactForm(null));
+  $('#relList').addEventListener('click', e => {
+    const b = e.target.closest('[data-act]'); if (!b) return;
+    if (b.dataset.act === 'addC') return contactForm(null);
+    const c = find('contacts', b.dataset.id); if (!c) return;
+    if (b.dataset.act === 'editC') contactForm(c);
+    if (b.dataset.act === 'doneC') markRelance(c);
+    if (b.dataset.act === 'entC') entretienForm(null, c);
+    if (b.dataset.act === 'msgC') {
+      const n = (c.nbRelances||0)+1;
+      openMsg({ title:`${n===1?'1re':n+'e'} relance : ${c.nom}`, start: c.email ? 'email' : (c.tel ? 'sms' : 'email'),
+        channels:{ email:{dest:c.email, text:relanceText(c,'email')}, sms:{dest:c.tel, text:relanceText(c,'sms')}, tel:{dest:c.tel, text:relanceText(c,'tel')} },
+        doneLabel:"J'ai relancé ✓", onDone: ch => markRelance(find('contacts', c.id), ch) });
+    }
+  });
+
+  // =====================================================================
+  // ENTRETIENS
+  // =====================================================================
+  function entretienForm(e, fromContact){
+    const isNew = !e;
+    const contactsOpts = [['','— Aucune —'], ...S.contacts.map(c => [c.id, c.nom])];
+    const base = e || (fromContact ? {contactId:fromContact.id, entreprise:fromContact.nom, poste:fromContact.poste, interlocuteur:fromContact.contact, lieu:fromContact.ville, type:'Sur place', resultat:'prevu', date:addDays(todayISO(),1), heure:'10:00'}
+                                   : {type:'Sur place', resultat:'prevu', date:addDays(todayISO(),1), heure:'10:00'});
+    openForm({
+      title: isNew ? 'Nouvel entretien' : "Modifier l'entretien",
+      values: base,
+      fields: [
+        {k:'contactId', label:'Lié à la candidature', type:'select', options:contactsOpts, full:true},
+        {k:'entreprise', label:'Entreprise', required:true},
+        {k:'poste', label:'Poste'},
+        {k:'date', label:'Date', type:'date', required:true},
+        {k:'heure', label:'Heure', type:'time'},
+        {k:'type', label:'Type', type:'select', options:ENT_TYPES},
+        {k:'interlocuteur', label:'Avec qui', ph:'Ex. M. Leroy, responsable d\'équipe'},
+        {k:'lieu', label:'Adresse ou lien', full:true, ph:'Ex. 12 rue de la Gare, Saint-Denis'},
+        {k:'resultat', label:'Résultat', type:'select', options:Object.entries(RESULT)},
+        {k:'notes', label:'Notes (questions à poser, ce qu\'il faut apporter…)', type:'textarea'}
+      ],
+      onChange: (k, v, set) => { if (k === 'contactId' && v.contactId) { const c = find('contacts', v.contactId); if (c) { set('entreprise', c.nom); set('poste', c.poste); set('interlocuteur', c.contact); if (!v.lieu) set('lieu', c.ville); } } },
+      onSave: async v => {
+        const obj = {...(e||{id:uid(), remercie:false}), ...v};
+        S.entretiens = S.entretiens.filter(x => x.id !== obj.id); S.entretiens.push(obj);
+        const c = v.contactId && find('contacts', v.contactId);
+        if (c) {
+          let statut = c.statut;
+          if (v.resultat === 'positif') statut = c.statut === 'offre' ? 'offre' : 'entretien';
+          else if (c.statut === 'attente') statut = 'entretien';
+          Object.assign(c, {statut, prochaineRelance: v.date >= todayISO() ? addDays(v.date, 3) : c.prochaineRelance});
+        }
+        await persist();
+        toast(isNew ? `Entretien ajouté le ${shortDate(v.date)}` : 'Modifications enregistrées');
+      },
+      onDelete: e ? async () => removeItem('entretiens', e.id) : null
+    });
+  }
+  function merciText(e, ch){
+    const bonjour = e.interlocuteur ? `Bonjour ${e.interlocuteur},` : 'Bonjour,';
+    const poste = e.poste ? ` pour le poste « ${e.poste} »` : '';
+    if (ch === 'sms') return `${bonjour} merci pour l'entretien du ${frDate(e.date)}${poste}. Le poste me plaît beaucoup et je reste disponible pour la suite. Bonne journée, ${moi()}`;
+    return `Objet : Merci pour notre entretien${e.poste ? ' – ' + e.poste : ''}\n\n${bonjour}\n\nJe vous remercie pour le temps que vous m'avez accordé lors de notre entretien du ${frDate(e.date)}${poste}.\n\nNotre échange m'a conforté·e dans mon envie de rejoindre ${e.entreprise}. Je reste à votre disposition pour toute information complémentaire et pour la suite du processus.\n\nDans l'attente de votre retour, je vous souhaite une très bonne journée.\n\nCordialement,\n${signature()}`;
+  }
+  function renderEntretiens(){
+    const t = todayISO(), box = $('#entList');
+    if (!S.entretiens.length) { box.innerHTML = `<div class="empty"><h3>Aucun entretien enregistré</h3><p>Ajoutez vos entretiens pour recevoir un rappel la veille et préparer un message de remerciement juste après.</p><button class="btn primary" type="button" data-act="addE">+ Ajouter un entretien</button></div>`; return; }
+    const up = S.entretiens.filter(e => e.date >= t).sort((a,b) => (a.date+a.heure).localeCompare(b.date+b.heure));
+    const past = S.entretiens.filter(e => e.date < t).sort((a,b) => (b.date+b.heure).localeCompare(a.date+a.heure));
+    const card = (e, isPast) => {
+      const d = parse(e.date), dd = diffDays(e.date, t);
+      const tag = dd === 0 ? `<span class="pill p-late">Aujourd'hui</span>` : dd === 1 ? `<span class="pill p-warn">Demain</span>` : (!isPast && dd <= 7 ? `<span class="pill p-acc">Dans ${dd} j</span>` : '');
+      const res = isPast ? `<span class="pill ${e.resultat==='positif'?'p-ok':e.resultat==='negatif'?'p-no':'p-warn'}">${RESULT[e.resultat]||RESULT.prevu}</span>` : '';
+      const remind = isPast && !e.remercie && dd >= -7 && e.resultat !== 'negatif';
+      return `<article class="row dated ${dd===0||dd===1?'flag-acc':''}">
+        <div class="datebox"><span>${d.toLocaleDateString('fr-FR',{month:'short'}).replace('.','')}</span><b>${d.getDate()}</b><span>${d.toLocaleDateString('fr-FR',{weekday:'short'}).replace('.','')}</span></div>
+        <div class="main">
+          <div class="title"><strong>${esc(e.entreprise)}</strong> ${tag} ${res} ${e.remercie?'<span class="pill p-ok">Remercié ✓</span>':''}</div>
+          <div class="meta"><span class="mono">${hhmm(e.heure)||'Heure ?'}</span><span>${esc(e.type||'')}</span>${e.poste?`<span>${esc(e.poste)}</span>`:''}${e.interlocuteur?`<span>${esc(e.interlocuteur)}</span>`:''}${e.lieu?`<span>${esc(e.lieu)}</span>`:''}</div>
+          ${e.notes?`<div class="note">${esc(e.notes)}</div>`:''}
+          ${remind?`<div class="when soon">Pensez à envoyer un message de remerciement</div>`:''}
+        </div>
+        <div class="side-actions">
+          ${isPast && e.resultat==='prevu' ? `<button class="btn small good" type="button" data-act="resPos" data-id="${e.id}">Positif</button><button class="btn small" type="button" data-act="resNeg" data-id="${e.id}">Négatif</button>`:''}
+          ${isPast && !e.remercie ? `<button class="btn small primary" type="button" data-act="merci" data-id="${e.id}">Remercier</button>`:''}
+          <button class="btn small ghost" type="button" data-act="editE" data-id="${e.id}">Modifier</button>
+        </div></article>`;
+    };
+    box.innerHTML = `<div class="group-title">À venir</div>${up.length ? up.map(e => card(e,false)).join('') : '<p class="note">Aucun entretien prévu.</p>'}
+      ${past.length ? `<div class="group-title">Passés</div>${past.map(e => card(e,true)).join('')}` : ''}`;
+  }
+  $('#btnAddE').addEventListener('click', () => entretienForm(null));
+  $('#entList').addEventListener('click', async ev => {
+    const b = ev.target.closest('[data-act]'); if (!b) return;
+    if (b.dataset.act === 'addE') return entretienForm(null);
+    const e = find('entretiens', b.dataset.id); if (!e) return;
+    if (b.dataset.act === 'editE') entretienForm(e);
+    if (b.dataset.act === 'resPos' || b.dataset.act === 'resNeg') {
+      e.resultat = b.dataset.act === 'resPos' ? 'positif' : 'negatif';
+      const c = e.contactId && find('contacts', e.contactId);
+      if (c && e.resultat === 'negatif' && c.statut === 'entretien') c.statut = 'refus';
+      await persist(); toast('Résultat enregistré');
+    }
+    if (b.dataset.act === 'merci') {
+      const c = e.contactId && find('contacts', e.contactId);
+      openMsg({ title:`Remerciement : ${e.entreprise}`, channels:{ email:{dest:c?.email, text:merciText(e,'email')}, sms:{dest:c?.tel, text:merciText(e,'sms')} },
+        doneLabel:"C'est envoyé ✓", onDone: async () => { e.remercie = true; await persist(); toast('Remerciement noté'); } });
+    }
+  });
+
+  // =====================================================================
+  // MISSIONS
+  // =====================================================================
+  function missionForm(m){
+    const isNew = !m;
+    const t = todayISO();
+    openForm({
+      title: isNew ? 'Nouvelle mission' : 'Modifier la mission',
+      values: m || {debut:t, fin:addDays(t, 4), heuresSemaine:35},
+      fields: [
+        {k:'agence', label:"Agence d'intérim", required:true, list:'dlAgences', ph:'Ex. Adecco Paris 11e'},
+        {k:'contactAgence', label:"Contact à l'agence", ph:'Ex. Mme Martin'},
+        {k:'entreprise', label:'Entreprise (client)', required:true, ph:'Ex. Leroy Logistique'},
+        {k:'poste', label:'Poste', ph:'Ex. Cariste'},
+        {k:'debut', label:'Début', type:'date', required:true},
+        {k:'fin', label:'Fin prévue', type:'date', required:true},
+        {k:'horaires', label:'Horaires', ph:'Ex. 6h–13h, du lundi au vendredi'},
+        {k:'heuresSemaine', label:'Heures par semaine', type:'number', step:'0.5', min:0},
+        {k:'tauxHoraire', label:'Taux horaire brut (€)', type:'number', step:'0.01', min:0, ph:'Ex. 12,50'},
+        {k:'adresse', label:'Adresse du site', ph:'Ex. ZAC des Bruyères, Saint-Denis'},
+        {k:'notes', label:'Notes (EPI fournis, consignes, transport…)', type:'textarea'}
+      ],
+      onSave: async v => {
+        if (v.fin < v.debut) { toast('La fin doit être après le début'); return false; }
+        const obj = {...(m||{id:uid(), agenceRelancee:false}), ...v};
+        if (m && m.fin !== v.fin) obj.agenceRelancee = false;
+        await upsert('missions', obj);
+        toast(isNew ? 'Mission ajoutée' : 'Modifications enregistrées');
+      },
+      onDelete: m ? async () => removeItem('missions', m.id) : null
+    });
+  }
+  function missionText(m, ch){
+    const contactAg = m.contactAgence || find('contacts', S.contacts.find(c => c.nom === m.agence)?.id)?.contact;
+    const bonjour = contactAg ? `Bonjour ${contactAg},` : 'Bonjour,';
+    const dispo = frDate(addDays(m.fin, 1));
+    if (ch === 'sms') return `${bonjour} c'est ${moi()}. Ma mission chez ${m.entreprise} se termine le ${frDate(m.fin)}. Je suis disponible dès le ${dispo} pour une nouvelle mission${m.poste?` (${m.poste} ou autre)`:''}. Avez-vous quelque chose pour moi ? Merci !`;
+    return `Objet : Fin de mission le ${fullDate(m.fin)} – disponible dès le ${dispo}\n\n${bonjour}\n\nMa mission chez ${m.entreprise}${m.poste?` comme ${m.poste}`:''} se termine le ${frDate(m.fin)}.\n\nJe suis disponible dès le ${dispo} pour une nouvelle mission. Si l'entreprise souhaite prolonger, je suis bien sûr partant·e. Sinon, je serais ravi·e d'enchaîner sur une autre mission${m.poste?` de ${m.poste} ou dans un domaine proche`:''}.\n\nPouvez-vous me tenir au courant ?\n\nBien cordialement,\n${signature()}`;
+  }
+  function renderMissions(){
+    const box = $('#misList'), t = todayISO();
+    if (!S.missions.length) { box.innerHTML = `<div class="empty"><h3>Aucune mission enregistrée</h3><p>Notez vos missions d'intérim : le logiciel vous rappellera de prévenir l'agence avant la fin pour enchaîner sans trou.</p><button class="btn primary" type="button" data-act="addM">+ Ajouter une mission</button></div>`; return; }
+    const groups = {encours:[], avenir:[], finie:[]};
+    S.missions.forEach(m => groups[missionState(m)].push(m));
+    groups.encours.sort((a,b)=>a.fin.localeCompare(b.fin)); groups.avenir.sort((a,b)=>a.debut.localeCompare(b.debut)); groups.finie.sort((a,b)=>b.fin.localeCompare(a.fin));
+    const card = m => {
+      const st = missionState(m), alert = missionAlert(m);
+      const left = m.fin ? diffDays(m.fin, t) : null;
+      const weekly = (Number(m.heuresSemaine)||0) * (Number(m.tauxHoraire)||0);
+      const days = m.debut && m.fin ? diffDays(m.fin, m.debut) + 1 : 0;
+      let when = '';
+      if (st === 'encours') when = alert ? `<div class="when late">Se termine ${left===0?"aujourd'hui":left===1?'demain':`dans ${left} j`} : prévenez l'agence de vos disponibilités</div>`
+                                         : `<div class="when ${m.agenceRelancee?'good-t':'fine'}">${m.agenceRelancee?'Agence prévenue ✓ · ':''}Se termine le ${shortDate(m.fin)}${left!=null?` (dans ${left} j)`:''}</div>`;
+      if (st === 'avenir') when = `<div class="when fine">Commence ${diffDays(m.debut,t)===1?'demain':`le ${frDay(m.debut)}`}</div>`;
+      return `<article class="row ${alert?'flag':st==='encours'?'flag-ok':''}">
+        <div class="main">
+          <div class="title"><strong>${esc(m.entreprise)}</strong><span class="pill p-acc">via ${esc(m.agence)}</span>
+            <span class="pill ${st==='encours'?'p-ok':st==='avenir'?'p-warn':'p-no'}">${st==='encours'?'En cours':st==='avenir'?'À venir':'Terminée'}</span></div>
+          <div class="meta">${m.poste?`<span>${esc(m.poste)}</span>`:''}<span class="mono">${shortDate(m.debut)} → ${shortDate(m.fin)} · ${plural(days,'jour')}</span>${m.horaires?`<span>${esc(m.horaires)}</span>`:''}${m.adresse?`<span>${esc(m.adresse)}</span>`:''}</div>
+          ${weekly ? `<div class="note">≈ ${euro(weekly)} brut / semaine (${String(m.heuresSemaine).replace('.',',')} h × ${euro(Number(m.tauxHoraire))}), hors indemnités de fin de mission et congés payés</div>` : ''}
+          ${when}
+        </div>
+        <div class="side-actions">
+          ${st==='encours' && !m.agenceRelancee ? `<button class="btn small ${alert?'primary':''}" type="button" data-act="msgM" data-id="${m.id}">Prévenir l'agence</button>`:''}
+          <button class="btn small ghost" type="button" data-act="editM" data-id="${m.id}">Modifier</button>
+        </div></article>`;
+    };
+    box.innerHTML = [['encours','En cours'],['avenir','À venir'],['finie','Terminées']].filter(([k]) => groups[k].length)
+      .map(([k,l]) => `<div class="group-title">${l}</div>${groups[k].map(card).join('')}`).join('');
+  }
+  $('#btnAddM').addEventListener('click', () => missionForm(null));
+  $('#misList').addEventListener('click', ev => {
+    const b = ev.target.closest('[data-act]'); if (!b) return;
+    if (b.dataset.act === 'addM') return missionForm(null);
+    const m = find('missions', b.dataset.id); if (!m) return;
+    if (b.dataset.act === 'editM') missionForm(m);
+    if (b.dataset.act === 'msgM') {
+      const ag = S.contacts.find(c => c.nom === m.agence);
+      openMsg({ title:`Fin de mission : prévenir ${m.agence}`, start: ag?.email ? 'email' : 'sms',
+        channels:{ email:{dest:ag?.email, text:missionText(m,'email')}, sms:{dest:ag?.tel, text:missionText(m,'sms')} },
+        doneLabel:"Agence prévenue ✓",
+        onDone: async ch => {
+          m.agenceRelancee = true;
+          if (ag) { ag.historique = [...(ag.historique||[]), {date:todayISO(), action:'Relance (fin de mission)', canal:ch}].slice(-60); ag.derniereAction = todayISO(); ag.nbRelances = (ag.nbRelances||0)+1; }
+          await persist(); toast('Agence prévenue');
+        } });
+    }
+  });
+
+  // =====================================================================
+  // DOCUMENTS
+  // =====================================================================
+  const extOf = f => (String(f||'').split('.').pop() || '').slice(0,4);
+  const sizeOf = n => !n ? '' : n < 1024*1024 ? `${Math.max(1,Math.round(n/1024))} Ko` : `${(n/1024/1024).toFixed(1).replace('.',',')} Mo`;
+  // Sous-catégories : enregistrées dans les réglages, par catégorie
+  const NEW_SUB = '__new__';
+  const subsStore = () => (S.settings.docSubcats ||= {});
+  const subcatsOf = cat => [...new Set([...(subsStore()[cat] || []), ...S.documents.filter(d => d.categorie === cat && d.sous).map(d => d.sous)])].sort((a,b) => a.localeCompare(b,'fr'));
+  function addSubcat(cat, name){ const st = subsStore(); st[cat] = [...new Set([...(st[cat]||[]), name])]; }
+  const subOptions = (cat, cur) => [['','— Aucune —'], ...subcatsOf(cat).map(s => [s, s]), ...(cur && !subcatsOf(cat).includes(cur) ? [[cur, cur]] : []), [NEW_SUB, '+ Nouvelle sous-catégorie…']];
+  function fillSubSelect(cat, cur){
+    const sel = $('#f_sous'); if (!sel) return;
+    sel.innerHTML = subOptions(cat, cur).map(([o,l]) => `<option value="${esc(o)}" ${o===(cur||'')?'selected':''}>${esc(l)}</option>`).join('');
+    toggleNewSub();
+  }
+  function toggleNewSub(){ const lab = $('#f_sousNew')?.closest('label'); if (lab) { lab.hidden = $('#f_sous').value !== NEW_SUB; if (!lab.hidden) $('#f_sousNew').focus(); } }
+
+  function documentForm(d, file, preset){
+    const isNew = !d;
+    const guessCat = f => /cv/i.test(f) ? 'CV' : /lettre|motiv/i.test(f) ? 'Lettre de motivation' : 'Autre';
+    const values = d || {nom:(file.originalName||'').replace(/\.[^.]+$/,''), categorie: preset?.categorie || guessCat(file.originalName||''), sous: preset?.sous || ''};
+    openForm({
+      title: isNew ? 'Nouveau document' : 'Modifier le document',
+      values,
+      fields: [
+        {k:'nom', label:'Nom', required:true, full:true, ph:'Ex. CV cariste – octobre 2026'},
+        {k:'categorie', label:'Catégorie', type:'select', options:DOC_CATS.map(c=>[c,c])},
+        {k:'sous', label:'Sous-catégorie', type:'select', options:subOptions(values.categorie, values.sous)},
+        {k:'sousNew', label:'Nom de la nouvelle sous-catégorie', full:true, ph:'Ex. Cariste, Logistique, Version courte…'},
+        {k:'expiration', label:"Date d'expiration (si elle existe)", type:'date'},
+        {k:'info', type:'info', html:`Fichier : ${esc((d||file).originalName)} ${sizeOf((d||file).size)}`},
+        {k:'notes', label:'Notes', type:'textarea', ph:'Ex. version courte, à jour avec la dernière mission'}
+      ],
+      onChange: (k, v) => { if (k === 'categorie') fillSubSelect(v.categorie, ''); if (k === 'sous') toggleNewSub(); },
+      onSave: async v => {
+        let sous = v.sous;
+        if (sous === NEW_SUB) { sous = v.sousNew.trim(); if (!sous) { toast('Donnez un nom à la nouvelle sous-catégorie'); $('#f_sousNew').focus(); return false; } }
+        if (sous) addSubcat(v.categorie, sous);
+        const {sousNew, ...rest} = v;
+        await upsert('documents', isNew ? {id:uid(), ...file, ajoute:todayISO(), ...rest, sous} : {...d, ...rest, sous});
+        toast(isNew ? 'Document ajouté' : 'Modifications enregistrées');
+      },
+      onCancel: isNew ? () => window.api.docDelete(file.fileName) : null,
+      onDelete: d ? async () => { await window.api.docDelete(d.fileName); S.contacts.forEach(c => { if (c.docs) c.docs = c.docs.filter(x => x !== d.id); }); await removeItem('documents', d.id); } : null
+    });
+    toggleNewSub();
+  }
+  function subcatForm(cat, name){
+    const isNew = !name;
+    openForm({
+      title: isNew ? 'Nouvelle sous-catégorie' : 'Renommer la sous-catégorie',
+      values: {categorie: cat || 'CV', nom: name || ''},
+      fields: [
+        {k:'categorie', label:'Dans la catégorie', type:'select', options:DOC_CATS.map(c=>[c,c]), full:true},
+        {k:'nom', label:'Nom de la sous-catégorie', required:true, full:true, ph:'Ex. Cariste, Logistique, Version anglaise…'},
+        ...(isNew ? [] : [{k:'info', type:'info', html:'Supprimer la sous-catégorie ne supprime pas ses documents : ils restent dans la catégorie.'}])
+      ],
+      saveLabel: isNew ? 'Créer' : 'Enregistrer',
+      onSave: async v => {
+        const st = subsStore();
+        if (isNew) {
+          if (subcatsOf(v.categorie).some(s => s.toLowerCase() === v.nom.toLowerCase())) { toast('Cette sous-catégorie existe déjà'); return false; }
+          addSubcat(v.categorie, v.nom);
+        } else {
+          st[cat] = (st[cat]||[]).filter(s => s !== name);
+          addSubcat(v.categorie, v.nom);
+          S.documents.forEach(d => { if (d.categorie === cat && d.sous === name) { d.categorie = v.categorie; d.sous = v.nom; } });
+        }
+        await persist();
+        toast(isNew ? `Sous-catégorie « ${v.nom} » créée` : 'Sous-catégorie renommée');
+      },
+      onDelete: isNew ? null : async () => {
+        const st = subsStore(); st[cat] = (st[cat]||[]).filter(s => s !== name);
+        S.documents.forEach(d => { if (d.categorie === cat && d.sous === name) d.sous = ''; });
+        await persist();
+      }
+    });
+  }
+
+  function docRow(d, t){
+    const sentTo = S.contacts.filter(c => (c.docs||[]).includes(d.id));
+    const left = d.expiration ? diffDays(d.expiration, t) : null;
+    const exp = left == null ? '' : left < 0 ? `<div class="when late">Expiré depuis le ${fullDate(d.expiration)}</div>` : left <= 30 ? `<div class="when soon">Expire le ${fullDate(d.expiration)} (dans ${left} j)</div>` : `<span class="mono">Valable jusqu'au ${fullDate(d.expiration)}</span>`;
+    return `<article class="row ${left!=null&&left<=30?'flag':''}">
+      <div class="main">
+        <div class="title"><span class="ext">${esc(extOf(d.originalName))}</span><strong>${esc(d.nom)}</strong></div>
+        <div class="meta"><span class="mono">Ajouté le ${shortDate(d.ajoute)}</span>${d.size?`<span>${sizeOf(d.size)}</span>`:''}
+          <span>${sentTo.length ? `Envoyé à ${sentTo.slice(0,3).map(c=>esc(c.nom)).join(', ')}${sentTo.length>3?` et ${sentTo.length-3} autres`:''}` : 'Pas encore envoyé'}</span>${left!=null&&left>30?exp:''}</div>
+        ${left!=null&&left<=30?exp:''}
+        ${d.notes?`<div class="note">${esc(d.notes)}</div>`:''}
+      </div>
+      <div class="side-actions">
+        <button class="btn small primary" type="button" data-act="openD" data-id="${d.id}">Ouvrir</button>
+        <button class="btn small" type="button" data-act="showD" data-id="${d.id}">Dans le dossier</button>
+        <button class="btn small ghost" type="button" data-act="editD" data-id="${d.id}">Modifier</button>
+      </div></article>`;
+  }
+  const folderIcon = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h6l2 2h10v11H3z"/></svg>`;
+  function renderDocuments(){
+    const box = $('#docList'), t = todayISO();
+    const cats = DOC_CATS.filter(cat => S.documents.some(d => d.categorie === cat) || subcatsOf(cat).length);
+    if (!cats.length) { box.innerHTML = `<div class="empty"><h3>Aucun document</h3><p>Ajoutez votre CV, vos lettres, diplômes, permis ou CACES. Vous pouvez aussi créer des sous-catégories (par exemple « CV › Cariste ») pour ranger plusieurs versions.</p><div class="actions"><button class="btn primary" type="button" data-act="addD">+ Ajouter un document</button><button class="btn" type="button" data-act="newSub">+ Créer une sous-catégorie</button></div></div>`; return; }
+    const sortDocs = list => list.sort((a,b) => (b.ajoute||'').localeCompare(a.ajoute||''));
+    box.innerHTML = cats.map(cat => {
+      const loose = sortDocs(S.documents.filter(d => d.categorie === cat && !d.sous));
+      const subs = subcatsOf(cat);
+      const n = S.documents.filter(d => d.categorie === cat).length;
+      return `<section class="cat">
+        <div class="cathead"><h2>${esc(cat)} <span class="mono muted">${n}</span></h2>
+          <button class="btn small ghost" type="button" data-act="newSub" data-cat="${esc(cat)}">+ Sous-catégorie</button></div>
+        ${loose.map(d => docRow(d, t)).join('')}
+        ${subs.map(s => {
+          const docs = sortDocs(S.documents.filter(d => d.categorie === cat && d.sous === s));
+          return `<div class="sub">
+            <div class="subhead">${folderIcon}<h3>${esc(s)}</h3><span class="mono muted">${docs.length}</span>
+              <span class="spacer"></span>
+              <button class="btn small" type="button" data-act="addHere" data-cat="${esc(cat)}" data-sub="${esc(s)}">+ Ajouter ici</button>
+              <button class="btn small ghost" type="button" data-act="editSub" data-cat="${esc(cat)}" data-sub="${esc(s)}">Renommer</button></div>
+            ${docs.length ? docs.map(d => docRow(d, t)).join('') : `<p class="note">Aucun document dans cette sous-catégorie.</p>`}
+          </div>`;
+        }).join('')}
+      </section>`;
+    }).join('');
+  }
+  async function addDocument(preset){ try { const f = await window.api.docPick(); if (f) documentForm(null, f, preset); } catch { toast("Impossible d'ajouter ce fichier"); } }
+  $('#btnAddD').addEventListener('click', () => addDocument());
+  $('#btnAddSub').addEventListener('click', () => subcatForm());
+  $('#docList').addEventListener('click', async ev => {
+    const b = ev.target.closest('[data-act]'); if (!b) return;
+    const a = b.dataset.act;
+    if (a === 'addD') return addDocument();
+    if (a === 'newSub') return subcatForm(b.dataset.cat);
+    if (a === 'editSub') return subcatForm(b.dataset.cat, b.dataset.sub);
+    if (a === 'addHere') return addDocument({categorie:b.dataset.cat, sous:b.dataset.sub});
+    const d = find('documents', b.dataset.id); if (!d) return;
+    if (a === 'editD') documentForm(d);
+    if (a === 'showD') window.api.docShow(d.fileName);
+    if (a === 'openD') { const r = await window.api.docOpen(d.fileName); if (r === 'missing') toast('Fichier introuvable : ajoutez-le à nouveau'); else if (r) toast("Aucun programme pour ouvrir ce fichier"); }
+  });
+
+  // =====================================================================
+  // À DÉMARCHER (prospection)
+  // =====================================================================
+  let prosFilter = 'a_faire', prosQuery = '';
+  const PROS_ST = {a_faire:'À démarcher', candidate:'Candidature envoyée', non:'Pas intéressé'};
+  function prospectForm(p){
+    const isNew = !p;
+    openForm({
+      title: isNew ? 'Entreprise à démarcher' : "Modifier l'entreprise",
+      values: p || {priorite:'2'},
+      fields: [
+        {k:'nom', label:'Entreprise', required:true, ph:'Ex. Carrosserie Brondy'},
+        {k:'secteur', label:'Secteur / métier', list:'dlSecteurs', ph:'Ex. Soudure, Carrosserie, Logistique'},
+        {k:'ville', label:'Ville', ph:'Ex. Chantonnay'},
+        {k:'adresse', label:'Adresse'},
+        {k:'tel', label:'Téléphone', type:'tel'},
+        {k:'email', label:'Email', type:'email'},
+        {k:'contact', label:'Personne à contacter', ph:'Ex. le chef d\'atelier'},
+        {k:'site', label:'Site internet', ph:'https://…'},
+        {k:'priorite', label:'Priorité', type:'select', options:[['1','Haute'],['2','Normale'],['3','Basse']]},
+        {k:'notes', label:'Notes (pourquoi elle vous intéresse, qui vous en a parlé…)', type:'textarea'}
+      ],
+      onSave: async v => { await upsert('prospects', {...(p || {id:uid(), ajoute:todayISO(), statut:'a_faire'}), ...v}); toast(isNew ? 'Entreprise ajoutée à la liste' : 'Modifications enregistrées'); },
+      onDelete: p ? async () => removeItem('prospects', p.id) : null
+    });
+  }
+  function renderProspects(){
+    const all = S.prospects, box = $('#prosList');
+    const cnt = k => all.filter(p => p.statut === k).length;
+    $('#psTodo').textContent = cnt('a_faire'); $('#psDone').textContent = cnt('candidate'); $('#psNo').textContent = cnt('non');
+    $('#psHigh').textContent = all.filter(p => p.statut === 'a_faire' && p.priorite === '1').length;
+    $$('#prosTabs .tab').forEach(t => { const n = t.querySelector('.n'); if (n) n.textContent = t.dataset.f === 'all' ? all.length : cnt(t.dataset.f); });
+    $('#dlSecteurs').innerHTML = [...new Set(all.map(p => p.secteur).filter(Boolean))].map(s => `<option value="${esc(s)}">`).join('');
+    if (!all.length) { box.innerHTML = `<div class="empty"><h3>Votre liste est vide</h3><p>Notez les entreprises qui vous intéressent, près de chez vous ou dans votre métier. Quand vous candidatez, un clic les fait passer dans vos relances.</p><div class="actions"><button class="btn primary" type="button" data-act="addP">+ Ajouter une entreprise</button><button class="btn" type="button" data-act="importP">Importer un tableau Excel</button></div></div>`; return; }
+    let list = prosFilter === 'all' ? all : all.filter(p => p.statut === prosFilter);
+    if (prosQuery) { const q = prosQuery.toLowerCase(); list = list.filter(p => [p.nom,p.secteur,p.ville,p.notes,p.contact].join(' ').toLowerCase().includes(q)); }
+    list = [...list].sort((a,b) => String(a.priorite||'2').localeCompare(String(b.priorite||'2')) || (a.ville||'').localeCompare(b.ville||'','fr') || a.nom.localeCompare(b.nom,'fr'));
+    if (!list.length) { box.innerHTML = `<div class="empty"><h3>${prosFilter==='a_faire'?'Toutes les entreprises de la liste ont été démarchées':'Aucun résultat'}</h3><p>Ajoutez-en de nouvelles ou changez de filtre.</p></div>`; return; }
+    box.innerHTML = list.map(p => `<article class="row ${p.statut==='a_faire'&&p.priorite==='1'?'flag-acc':''}">
+      <div class="main">
+        <div class="title"><strong>${esc(p.nom)}</strong>${p.secteur?`<span class="pill p-neutral">${esc(p.secteur)}</span>`:''}
+          ${p.statut==='a_faire' && p.priorite==='1' ? '<span class="pill p-late">Priorité haute</span>' : ''}
+          ${p.statut!=='a_faire' ? `<span class="pill ${p.statut==='candidate'?'p-ok':'p-no'}">${PROS_ST[p.statut]}${p.dateCandidature?` le ${shortDate(p.dateCandidature)}`:''}</span>` : ''}</div>
+        <div class="meta">${p.ville?`<span>${esc(p.ville)}</span>`:''}${p.adresse?`<span>${esc(p.adresse)}</span>`:''}${p.contact?`<span>${esc(p.contact)}</span>`:''}${p.tel?`<span class="mono">${esc(p.tel)}</span>`:''}${p.email?`<span>${esc(p.email)}</span>`:''}</div>
+        ${p.notes?`<div class="note">${esc(p.notes)}</div>`:''}
+      </div>
+      <div class="side-actions">
+        ${p.site?`<button class="btn small ghost" type="button" data-act="siteP" data-id="${p.id}">Site</button>`:''}
+        ${p.statut==='a_faire' ? `<button class="btn small primary" type="button" data-act="candP" data-id="${p.id}">J'ai candidaté</button><button class="btn small" type="button" data-act="noP" data-id="${p.id}">Pas intéressé</button>` : ''}
+        ${p.statut==='candidate' && p.contactId && find('contacts', p.contactId) ? `<button class="btn small" type="button" data-act="seeP" data-id="${p.id}">Voir la candidature</button>` : ''}
+        ${p.statut==='non' ? `<button class="btn small" type="button" data-act="backP" data-id="${p.id}">Remettre dans la liste</button>` : ''}
+        <button class="btn small ghost" type="button" data-act="editP" data-id="${p.id}">Modifier</button>
+      </div></article>`).join('');
+  }
+  function parseCsv(txt){
+    const first = txt.split(/\r?\n/)[0] || '';
+    const delim = [';','\t',','].sort((a,b) => first.split(b).length - first.split(a).length)[0];
+    const rows = []; let row = [], cell = '', q = false;
+    for (let i = 0; i < txt.length; i++) {
+      const ch = txt[i];
+      if (q) { if (ch === '"') { if (txt[i+1] === '"') { cell += '"'; i++; } else q = false; } else cell += ch; }
+      else if (ch === '"') q = true;
+      else if (ch === delim) { row.push(cell); cell = ''; }
+      else if (ch === '\n') { row.push(cell); rows.push(row); row = []; cell = ''; }
+      else if (ch !== '\r') cell += ch;
+    }
+    if (cell || row.length) { row.push(cell); rows.push(row); }
+    return rows.filter(r => r.some(c => c.trim()));
+  }
+  const COLMAP = [['nom',/^(nom|entreprise|soci[ée]t[ée]|raison|employeur)/i],['secteur',/(secteur|activit|m[ée]tier|domaine)/i],['ville',/(ville|commune|localit)/i],['adresse',/adresse/i],['tel',/(t[ée]l|phone|portable)/i],['email',/(mail|courriel)/i],['site',/(site|web|url)/i],['contact',/(contact|interlocuteur|responsable)/i],['notes',/(note|remarque|commentaire)/i]];
+  async function importProspects(){
+    let txt; try { txt = await window.api.readCsv(); } catch { toast('Impossible de lire ce fichier'); return; }
+    if (!txt) return;
+    const rows = parseCsv(txt); if (!rows.length) { toast('Le fichier est vide'); return; }
+    let map = rows[0].map(h => (COLMAP.find(([,re]) => re.test(h.trim())) || [])[0]);
+    let data = rows.slice(1);
+    if (!map.includes('nom')) { map = ['nom','secteur','ville','tel','email']; data = rows; }
+    const seen = new Set(S.prospects.map(p => (p.nom + '|' + (p.ville||'')).toLowerCase()));
+    let n = 0;
+    for (const r of data) {
+      const p = {id:uid(), ajoute:todayISO(), statut:'a_faire', priorite:'2'};
+      map.forEach((k, i) => { if (k && r[i] && r[i].trim()) p[k] = r[i].trim(); });
+      if (!p.nom) continue;
+      const key = (p.nom + '|' + (p.ville||'')).toLowerCase(); if (seen.has(key)) continue;
+      seen.add(key); S.prospects.push(p); n++;
+    }
+    await persist();
+    toast(n ? `${plural(n,'entreprise ajoutée','entreprises ajoutées')}` : 'Aucune nouvelle entreprise dans ce fichier');
+  }
+  $('#btnAddP').addEventListener('click', () => prospectForm(null));
+  $('#btnImportP').addEventListener('click', importProspects);
+  $('#prosTabs').addEventListener('click', e => { const t = e.target.closest('.tab'); if (!t) return; prosFilter = t.dataset.f; $$('#prosTabs .tab').forEach(x => x.setAttribute('aria-selected', x === t)); renderProspects(); });
+  $('#qP').addEventListener('input', e => { prosQuery = e.target.value.trim(); renderProspects(); });
+  $('#prosList').addEventListener('click', async ev => {
+    const b = ev.target.closest('[data-act]'); if (!b) return;
+    const a = b.dataset.act;
+    if (a === 'addP') return prospectForm(null);
+    if (a === 'importP') return importProspects();
+    const p = find('prospects', b.dataset.id); if (!p) return;
+    if (a === 'editP') prospectForm(p);
+    if (a === 'siteP') window.api.openExternal(/^https?:/i.test(p.site) ? p.site : 'https://' + p.site);
+    if (a === 'noP') { p.statut = 'non'; await persist(); toast('Marquée « pas intéressé »'); }
+    if (a === 'backP') { p.statut = 'a_faire'; await persist(); }
+    if (a === 'seeP') { go('relances'); relFilter = 'all'; $$('#relTabs .tab').forEach(x => x.setAttribute('aria-selected', x.dataset.f === 'all')); $('#q').value = query = p.nom; renderRelances(); }
+    if (a === 'candP') contactForm(null, {type:'entreprise', nom:p.nom, ville:p.ville, email:p.email, tel:p.tel, contact:p.contact, notes:p.notes},
+      async id => { p.statut = 'candidate'; p.contactId = id; p.dateCandidature = todayISO(); await persist(); toast('Candidature ajoutée à vos relances'); });
+  });
+
+  // =====================================================================
+  // PAIE (fiches de paie d'intérim)
+  // =====================================================================
+  const num = v => Number(v) || 0;
+  const fmtH = h => { const n = Math.round(num(h)*100)/100; const hh = Math.floor(n), mm = Math.round((n-hh)*60); return mm ? `${hh} h ${pad(mm)}` : `${hh} h`; };
+  const missionLabel = m => `${m.entreprise} via ${m.agence} (${shortDate(m.debut)} → ${shortDate(m.fin)})`;
+  function slipIssues(p){
+    const hf = num(p.heuresFaites), hp = num(p.heuresPayees), t = num(p.tauxHoraire);
+    return hf && hp && hp < hf - 0.01 ? [`${fmtH(hf-hp)} faites mais non payées sur cette fiche (≈ ${euro((hf-hp)*t)} brut)`] : [];
+  }
+  function missionPay(m){
+    const slips = S.paies.filter(p => p.missionId === m.id);
+    if (!slips.length) return null;
+    const t0 = num(m.tauxHoraire);
+    const hp = slips.reduce((s,p) => s + num(p.heuresPayees), 0), hf = slips.reduce((s,p) => s + num(p.heuresFaites), 0);
+    const base = slips.reduce((s,p) => s + num(p.heuresPayees) * (num(p.tauxHoraire) || t0), 0);
+    const ifm = slips.reduce((s,p) => s + num(p.ifm), 0), iccp = slips.reduce((s,p) => s + num(p.iccp), 0);
+    const ifmAtt = base * 0.10, iccpAtt = (base + ifmAtt) * 0.10;
+    const finished = missionState(m) === 'finie';
+    const issues = [];
+    if (hf && hp < hf - 0.01) issues.push(`${fmtH(hf-hp)} faites mais non payées`);
+    if (finished && base) {
+      if (ifm < ifmAtt - 1) issues.push(`Indemnité de fin de mission : ${euro(ifm)} reçus, environ ${euro(ifmAtt)} attendus`);
+      if (iccp < iccpAtt - 1) issues.push(`Congés payés : ${euro(iccp)} reçus, environ ${euro(iccpAtt)} attendus`);
+    }
+    return {slips, hp, hf, base, ifm, iccp, ifmAtt, iccpAtt, finished, issues, net: slips.reduce((s,p) => s + num(p.net), 0)};
+  }
+  function paieForm(p){
+    const isNew = !p;
+    const cur = S.missions.filter(m => missionState(m) === 'encours');
+    const m0 = cur.length === 1 ? cur[0] : null;
+    openForm({
+      title: isNew ? 'Nouvelle fiche de paie' : 'Modifier la fiche de paie',
+      values: p || {mois: todayISO().slice(0,7), missionId: m0?.id || '', agence: m0?.agence, entreprise: m0?.entreprise, tauxHoraire: m0?.tauxHoraire, dateRecue: todayISO()},
+      fields: [
+        {k:'missionId', label:'Mission concernée', type:'select', full:true, options:[['','— Aucune / plusieurs —'], ...[...S.missions].sort((a,b)=>b.debut.localeCompare(a.debut)).map(m => [m.id, missionLabel(m)])]},
+        {k:'agence', label:'Agence', list:'dlAgences', required:true},
+        {k:'entreprise', label:'Entreprise'},
+        {k:'mois', label:'Mois de la fiche', type:'month', required:true},
+        {k:'dateRecue', label:'Reçue le', type:'date'},
+        {k:'heuresFaites', label:'Heures que vous avez faites (votre compte)', type:'number', step:'0.25', min:0},
+        {k:'heuresPayees', label:'Heures payées sur la fiche', type:'number', step:'0.25', min:0},
+        {k:'tauxHoraire', label:'Taux horaire brut (€)', type:'number', step:'0.01', min:0},
+        {k:'brut', label:'Salaire brut total (€)', type:'number', step:'0.01', min:0},
+        {k:'ifm', label:'Indemnité de fin de mission (IFM) (€)', type:'number', step:'0.01', min:0, ph:'0 si absente'},
+        {k:'iccp', label:'Congés payés (ICCP) (€)', type:'number', step:'0.01', min:0, ph:'0 si absents'},
+        {k:'net', label:'Net payé (€)', type:'number', step:'0.01', min:0},
+        {k:'notes', label:'Notes', type:'textarea', ph:'Ex. heures du samedi 4 non comptées'}
+      ],
+      onChange: (k, v, set) => { if (k === 'missionId' && v.missionId) { const m = find('missions', v.missionId); if (m) { set('agence', m.agence); set('entreprise', m.entreprise); set('tauxHoraire', m.tauxHoraire); } } },
+      onSave: async v => { await upsert('paies', {...(p || {id:uid()}), ...v}); toast(isNew ? 'Fiche de paie ajoutée' : 'Modifications enregistrées'); },
+      onDelete: p ? async () => { if (p.fichier) await window.api.docDelete(p.fichier.fileName); await removeItem('paies', p.id); } : null
+    });
+  }
+  function paieMsg(p){
+    const m = p.missionId && find('missions', p.missionId);
+    const mp = m && missionPay(m);
+    const issues = [...slipIssues(p), ...(mp ? mp.issues.filter(i => !/non payées/.test(i)) : [])];
+    const ag = S.contacts.find(c => c.nom === p.agence);
+    const bonjour = (m?.contactAgence || ag?.contact) ? `Bonjour ${m?.contactAgence || ag?.contact},` : 'Bonjour,';
+    const mois = monthLabel(p.mois).toLowerCase();
+    return { dest: ag?.email, issues,
+      email: `Objet : Question sur ma fiche de paie de ${mois} – ${moi()}\n\n${bonjour}\n\nJe travaille pour vous en intérim${p.entreprise?` chez ${p.entreprise}`:''}. En vérifiant ma fiche de paie de ${mois}, je constate :\n\n${issues.map(i => '– ' + i).join('\n')}\n\nPourriez-vous vérifier et, si besoin, faire la régularisation sur la prochaine paie ? Je peux vous transmettre mon relevé d'heures.\n\nMerci d'avance,\n${signature()}`,
+      sms: `${bonjour} c'est ${moi()}. Sur ma fiche de paie de ${mois}${p.entreprise?` (${p.entreprise})`:''}, je pense qu'il y a une erreur : ${issues.join(' ; ')}. Pouvez-vous vérifier ? Merci !` };
+  }
+  function renderPaie(){
+    const box = $('#paieBody');
+    if (!S.paies.length) { box.innerHTML = `<div class="empty"><h3>Aucune fiche de paie enregistrée</h3><p>À chaque fiche reçue, notez les heures que vous avez faites et celles qui sont payées. Le logiciel repère les heures oubliées et, à la fin de chaque mission, vérifie l'indemnité de fin de mission et les congés payés.</p><button class="btn primary" type="button" data-act="addPay">+ Ajouter une fiche de paie</button></div>`; return; }
+    const y = todayISO().slice(0,4), mNow = todayISO().slice(0,7);
+    const yearSlips = S.paies.filter(p => (p.mois||'').startsWith(y));
+    const missionsPaid = S.missions.map(m => ({m, mp:missionPay(m)})).filter(x => x.mp).sort((a,b) => b.m.debut.localeCompare(a.m.debut));
+    const alerts = S.paies.filter(p => slipIssues(p).length).length + missionsPaid.filter(x => x.mp.issues.some(i => !/non payées/.test(i))).length;
+    const byMonth = {}; S.paies.forEach(p => (byMonth[p.mois] ||= []).push(p));
+    const months = Object.keys(byMonth).sort().reverse();
+    box.innerHTML = `
+      <div class="stats">
+        <div class="stat"><b>${euro(S.paies.filter(p=>p.mois===mNow).reduce((s,p)=>s+num(p.net),0)).replace(',00','')}</b><span>Net ce mois-ci</span></div>
+        <div class="stat"><b>${euro(yearSlips.reduce((s,p)=>s+num(p.net),0)).replace(',00','')}</b><span>Net en ${y}</span></div>
+        <div class="stat"><b>${fmtH(yearSlips.reduce((s,p)=>s+num(p.heuresPayees),0))}</b><span>Heures payées en ${y}</span></div>
+        <div class="stat ${alerts?'hot':''}"><b>${alerts}</b><span>À vérifier</span></div>
+      </div>
+      ${missionsPaid.length ? `<div class="panel"><h2>Contrôle par mission</h2>
+        <div class="tablewrap"><table>
+          <thead><tr><th>Mission</th><th class="num">Heures payées / faites</th><th class="num">IFM reçue / attendue</th><th class="num">Congés payés reçus / attendus</th><th>Bilan</th></tr></thead>
+          <tbody>${missionsPaid.map(({m, mp}) => `<tr>
+            <td><b>${esc(m.entreprise)}</b><br><span class="note">via ${esc(m.agence)} · ${shortDate(m.debut)} → ${shortDate(m.fin)} · ${plural(mp.slips.length,'fiche')}</span></td>
+            <td class="num">${fmtH(mp.hp)}${mp.hf?` / ${fmtH(mp.hf)}`:''}</td>
+            <td class="num">${euro(mp.ifm)}<br><span class="note">≈ ${euro(mp.ifmAtt)}</span></td>
+            <td class="num">${euro(mp.iccp)}<br><span class="note">≈ ${euro(mp.iccpAtt)}</span></td>
+            <td>${mp.issues.length ? `<span class="pill p-late">À vérifier</span><div class="note">${mp.issues.map(esc).join('<br>')}</div>` : mp.finished ? '<span class="pill p-ok">Conforme ✓</span>' : '<span class="pill p-warn">Mission en cours</span><div class="note">IFM et congés payés arrivent à la fin</div>'}</td>
+          </tr>`).join('')}</tbody>
+        </table></div></div>` : ''}
+      <div class="list">${months.map(mo => `<div class="group-title">${monthLabel(mo)}</div>` + byMonth[mo].map(p => {
+        const iss = slipIssues(p), m = p.missionId && find('missions', p.missionId), mp = m && missionPay(m);
+        const extra = mp ? mp.issues.filter(i => !/non payées/.test(i)) : [];
+        const all = [...iss, ...extra];
+        return `<article class="row ${iss.length?'flag':''}">
+          <div class="main">
+            <div class="title"><strong>${esc(p.entreprise || p.agence)}</strong><span class="pill p-acc">${esc(p.agence)}</span>${p.fichier?'<span class="pill p-neutral">Fiche jointe</span>':''}</div>
+            <div class="meta">${p.heuresPayees!==''&&p.heuresPayees!=null?`<span class="mono">${fmtH(p.heuresPayees)} payées${p.heuresFaites?` / ${fmtH(p.heuresFaites)} faites`:''}</span>`:''}
+              ${p.tauxHoraire?`<span class="mono">${euro(num(p.tauxHoraire))}/h</span>`:''}${p.brut?`<span>Brut ${euro(num(p.brut))}</span>`:''}
+              ${num(p.ifm)?`<span>IFM ${euro(num(p.ifm))}</span>`:''}${num(p.iccp)?`<span>CP ${euro(num(p.iccp))}</span>`:''}
+              ${p.net?`<span><b>Net ${euro(num(p.net))}</b></span>`:''}</div>
+            ${all.length ? all.map(i => `<div class="when late">⚠ ${esc(i)}</div>`).join('') : (p.heuresFaites && p.heuresPayees ? '<div class="when good-t">Heures conformes ✓</div>' : '')}
+            ${p.notes?`<div class="note">${esc(p.notes)}</div>`:''}
+          </div>
+          <div class="side-actions">
+            ${all.length ? `<button class="btn small primary" type="button" data-act="msgPay" data-id="${p.id}">Signaler à l'agence</button>` : ''}
+            ${p.fichier ? `<button class="btn small" type="button" data-act="openPay" data-id="${p.id}">Voir la fiche</button>` : `<button class="btn small" type="button" data-act="filePay" data-id="${p.id}">Joindre la fiche</button>`}
+            <button class="btn small ghost" type="button" data-act="editPay" data-id="${p.id}">Modifier</button>
+          </div></article>`;
+      }).join('')).join('')}</div>
+      <p class="note">Montants attendus estimés : indemnité de fin de mission = 10 % du brut de la mission ; congés payés = 10 % du brut + IFM. Primes, heures supplémentaires et cas particuliers (CDI intérimaire, fin anticipée à votre demande…) peuvent changer le calcul. En cas de doute, demandez le détail à l'agence.</p>`;
+  }
+  $('#btnAddPay').addEventListener('click', () => paieForm(null));
+  $('#paieBody').addEventListener('click', async ev => {
+    const b = ev.target.closest('[data-act]'); if (!b) return;
+    if (b.dataset.act === 'addPay') return paieForm(null);
+    const p = find('paies', b.dataset.id); if (!p) return;
+    if (b.dataset.act === 'editPay') paieForm(p);
+    if (b.dataset.act === 'openPay') { const r = await window.api.docOpen(p.fichier.fileName); if (r === 'missing') toast('Fichier introuvable'); }
+    if (b.dataset.act === 'filePay') { try { const f = await window.api.docPick('Choisir la fiche de paie (PDF ou photo)'); if (f) { p.fichier = f; await persist(); toast('Fiche jointe'); } } catch { toast("Impossible d'ajouter ce fichier"); } }
+    if (b.dataset.act === 'msgPay') {
+      const msg = paieMsg(p), ag = S.contacts.find(c => c.nom === p.agence);
+      openMsg({ title:`Fiche de paie de ${monthLabel(p.mois).toLowerCase()} : ${p.agence}`, start: msg.dest ? 'email' : 'sms',
+        channels:{ email:{dest:msg.dest, text:msg.email}, sms:{dest:ag?.tel, text:msg.sms} },
+        doneLabel:'Signalé ✓', onDone: async () => { p.notes = [p.notes, `Signalé à l'agence le ${shortDate(todayISO())}`].filter(Boolean).join('\n'); await persist(); toast('Noté'); } });
+    }
+  });
+
+  // =====================================================================
+  // FORMATIONS & HABILITATIONS
+  // =====================================================================
+  const FOR_TYPES = ['Formation','CACES','Habilitation','Permis','Certificat / titre pro'];
+  const FOR_ST = {prevue:'Prévue / inscrit', encours:'En cours', obtenue:'Obtenue', echouee:'Non obtenue'};
+  const forRenew = f => f.statut === 'obtenue' && f.expiration && diffDays(f.expiration, todayISO()) <= 60;
+  function formationForm(f){
+    const isNew = !f;
+    openForm({
+      title: isNew ? 'Nouvelle formation ou habilitation' : 'Modifier',
+      values: f || {type:'Formation', statut:'prevue'},
+      fields: [
+        {k:'nom', label:'Intitulé', required:true, full:true, ph:'Ex. Soudure MIG/MAG, CACES R489 cat. 3, SST'},
+        {k:'type', label:'Type', type:'select', options:FOR_TYPES.map(t=>[t,t])},
+        {k:'statut', label:'Où en êtes-vous ?', type:'select', options:Object.entries(FOR_ST)},
+        {k:'organisme', label:'Organisme / centre', ph:'Ex. AFPA La Roche-sur-Yon'},
+        {k:'financement', label:'Financement', ph:'Ex. CPF, France Travail, agence d\'intérim'},
+        {k:'dateDebut', label:'Début', type:'date'},
+        {k:'dateFin', label:'Fin / examen', type:'date'},
+        {k:'expiration', label:'Valable jusqu\'au (recyclage)', type:'date'},
+        {k:'documentId', label:'Attestation (dans Documents)', type:'select', options:[['','— Aucune —'], ...S.documents.map(d => [d.id, d.sous ? `${d.nom} (${d.sous})` : d.nom])]},
+        {k:'notes', label:'Notes (résultat, horaires, ce qu\'il faut apporter…)', type:'textarea'}
+      ],
+      onSave: async v => {
+        if (v.dateDebut && v.dateFin && v.dateFin < v.dateDebut) { toast('La fin doit être après le début'); return false; }
+        await upsert('formations', {...(f || {id:uid()}), ...v}); toast(isNew ? 'Ajouté' : 'Modifications enregistrées');
+      },
+      onDelete: f ? async () => removeItem('formations', f.id) : null
+    });
+  }
+  function renderFormations(){
+    const box = $('#forList'), t = todayISO();
+    if (!S.formations.length) { box.innerHTML = `<div class="empty"><h3>Aucune formation enregistrée</h3><p>Notez vos formations, CACES, habilitations et permis. Le logiciel vous rappelle les dates de session et vous prévient 2 mois avant qu'un recyclage soit nécessaire.</p><button class="btn primary" type="button" data-act="addF">+ Ajouter</button></div>`; return; }
+    const groups = [
+      ['À renouveler', S.formations.filter(forRenew)],
+      ['En cours', S.formations.filter(f => f.statut === 'encours')],
+      ['Prévues', S.formations.filter(f => f.statut === 'prevue').sort((a,b) => (a.dateDebut||'9').localeCompare(b.dateDebut||'9'))],
+      ['Obtenues', S.formations.filter(f => f.statut === 'obtenue' && !forRenew(f))],
+      ['Non obtenues', S.formations.filter(f => f.statut === 'echouee')]
+    ];
+    box.innerHTML = groups.filter(([,l]) => l.length).map(([g, l]) => `<div class="group-title">${g}</div>` + l.map(f => {
+      const left = f.expiration ? diffDays(f.expiration, t) : null;
+      const doc = f.documentId && find('documents', f.documentId);
+      const ended = f.dateFin && f.dateFin < t;
+      const starts = f.statut === 'prevue' && f.dateDebut ? diffDays(f.dateDebut, t) : null;
+      let when = '';
+      if (forRenew(f)) when = `<div class="when ${left<0?'late':'soon'}">${left<0?`Expirée depuis le ${fullDate(f.expiration)}`:`Expire le ${fullDate(f.expiration)} (dans ${left} j) : prévoyez le recyclage`}</div>`;
+      else if (starts != null && starts >= 0 && starts <= 7) when = `<div class="when soon">Commence ${starts===0?"aujourd'hui":starts===1?'demain':`dans ${starts} j`}</div>`;
+      else if ((f.statut === 'prevue' || f.statut === 'encours') && ended) when = `<div class="when soon">Terminée le ${fullDate(f.dateFin)} : indiquez le résultat</div>`;
+      return `<article class="row ${forRenew(f)?'flag':f.statut==='encours'?'flag-acc':''}">
+        <div class="main">
+          <div class="title"><strong>${esc(f.nom)}</strong><span class="pill p-neutral">${esc(f.type)}</span><span class="pill ${f.statut==='obtenue'?'p-ok':f.statut==='echouee'?'p-no':f.statut==='encours'?'p-acc':'p-warn'}">${FOR_ST[f.statut]}</span></div>
+          <div class="meta">${f.organisme?`<span>${esc(f.organisme)}</span>`:''}${f.dateDebut||f.dateFin?`<span class="mono">${f.dateDebut?fullDate(f.dateDebut):'?'}${f.dateFin&&f.dateFin!==f.dateDebut?` → ${fullDate(f.dateFin)}`:''}</span>`:''}
+            ${f.financement?`<span>${esc(f.financement)}</span>`:''}${f.expiration&&!forRenew(f)?`<span class="mono">Valable jusqu'au ${fullDate(f.expiration)}</span>`:''}</div>
+          ${when}
+          ${f.notes?`<div class="note">${esc(f.notes)}</div>`:''}
+        </div>
+        <div class="side-actions">
+          ${(f.statut==='prevue'||f.statut==='encours') && ended ? `<button class="btn small good" type="button" data-act="okF" data-id="${f.id}">Obtenue ✓</button><button class="btn small" type="button" data-act="koF" data-id="${f.id}">Non obtenue</button>` : ''}
+          ${doc ? `<button class="btn small" type="button" data-act="docF" data-id="${f.id}">Attestation</button>` : ''}
+          <button class="btn small ghost" type="button" data-act="editF" data-id="${f.id}">Modifier</button>
+        </div></article>`;
+    }).join('')).join('');
+  }
+  $('#btnAddF').addEventListener('click', () => formationForm(null));
+  $('#forList').addEventListener('click', async ev => {
+    const b = ev.target.closest('[data-act]'); if (!b) return;
+    if (b.dataset.act === 'addF') return formationForm(null);
+    const f = find('formations', b.dataset.id); if (!f) return;
+    if (b.dataset.act === 'editF') formationForm(f);
+    if (b.dataset.act === 'okF') { f.statut = 'obtenue'; await persist(); toast('Bravo ! Pensez à ajouter la date de validité si elle existe'); formationForm(f); }
+    if (b.dataset.act === 'koF') { f.statut = 'echouee'; await persist(); }
+    if (b.dataset.act === 'docF') { const d = find('documents', f.documentId); if (d) { const r = await window.api.docOpen(d.fileName); if (r === 'missing') toast('Fichier introuvable'); } }
+  });
+
+  // =====================================================================
+  // SAUVEGARDE AUTOMATIQUE (réglages)
+  // =====================================================================
+  const bk = () => (S.settings.backup ||= {enabled:false, dir:'', freq:'semaine', keep:10});
+  async function renderBackup(){
+    const b = bk();
+    $('#bkOn').checked = !!b.enabled; $('#bkDir').textContent = b.dir || 'Aucun dossier choisi';
+    $('#bkFreq').value = b.freq || 'semaine'; $('#bkKeep').value = b.keep || 10;
+    let st = {}; try { st = await window.api.backupStatus(); } catch {}
+    const el = $('#bkStatus');
+    if (st.error && b.enabled) { el.className = 'when late'; el.textContent = `⚠ ${st.error}`; }
+    else if (st.last) { const d = new Date(st.last); el.className = 'note'; el.textContent = `Dernière sauvegarde : ${d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})} à ${pad(d.getHours())}h${pad(d.getMinutes())}.`; }
+    else { el.className = 'note'; el.textContent = b.enabled ? 'Aucune sauvegarde pour l\'instant.' : 'La sauvegarde automatique est désactivée.'; }
+    $('#bSet').hidden = !(st.error && b.enabled);
+  }
+  async function runBackup(){
+    $('#bkNow').disabled = true;
+    try { const r = await window.api.backupNow(); toast(r.ok ? 'Sauvegarde faite' : r.error); } catch { toast('Sauvegarde impossible'); }
+    $('#bkNow').disabled = false; renderBackup();
+  }
+  async function pickBackupDir(){ try { const d = await window.api.pickDir(); if (d) { bk().dir = d; await persist(); } return d; } catch { return null; } }
+  $('#bkPick').addEventListener('click', async () => { if (await pickBackupDir()) { renderBackup(); if (bk().enabled) runBackup(); } });
+  $('#bkOn').addEventListener('change', async e => {
+    if (e.target.checked && !bk().dir && !(await pickBackupDir())) { e.target.checked = false; toast('Choisissez un dossier pour activer la sauvegarde'); return; }
+    bk().enabled = e.target.checked; await persist();
+    if (bk().enabled) runBackup(); else renderBackup();
+  });
+  $('#bkFreq').addEventListener('change', async e => { bk().freq = e.target.value; await persist(); });
+  $('#bkKeep').addEventListener('change', async e => { bk().keep = Math.max(1, Math.min(100, Number(e.target.value) || 10)); await persist(); });
+  $('#bkNow').addEventListener('click', async () => { if (!bk().dir && !(await pickBackupDir())) return; runBackup(); });
+  $('#bkOpen').addEventListener('click', () => { if (bk().dir) window.api.backupOpen(); else toast('Aucun dossier choisi'); });
+  $('#bkRestore').addEventListener('click', async () => {
+    try {
+      const r = await window.api.backupRestore(); if (!r) return;
+      if (r.error) { toast(r.error); return; }
+      load(r.data); applyTheme(); renderAll(); $('#dlgSet').close(); toast('Sauvegarde remise en place');
+    } catch { toast('Restauration impossible'); }
+  });
+
+  // =====================================================================
+  // DÉMARCHES (partagé par Statistiques et Bilan)
+  // =====================================================================
+  function demarches(){
+    const out = [], t = todayISO();
+    for (const c of S.contacts) {
+      const h = c.historique && c.historique.length ? c.historique : [{date:c.dateCandidature, action: c.type==='interim'?'Inscription en agence':'Candidature envoyée'}];
+      for (const x of h) {
+        const type = /^Relance/.test(x.action) ? 'Relance' : /Inscription/.test(x.action) ? 'Inscription en agence' : 'Candidature';
+        out.push({date:x.date, type, org:c.nom, poste:c.poste||'', moyen: x.canal ? CANAL[x.canal] : (type==='Inscription en agence' ? 'En agence' : type==='Candidature' ? (c.email ? 'Email' : 'Candidature écrite') : ''), ref:c});
+      }
+    }
+    for (const e of S.entretiens) out.push({date:e.date, type:"Entretien d'embauche", org:e.entreprise, poste:e.poste||'', moyen:[e.type, hhmm(e.heure)].filter(Boolean).join(', ')});
+    for (const f of S.formations) if (f.dateDebut && f.statut !== 'prevue') out.push({date:f.dateDebut, type:'Formation', org:f.organisme||'', poste:f.nom, moyen:[f.type, FOR_ST[f.statut]].filter(Boolean).join(', ')});
+    for (const m of S.missions) out.push({date:m.debut, type:"Mission d'intérim", org:`${m.entreprise} (via ${m.agence})`, poste:m.poste||'', moyen:`Du ${fullDate(m.debut)} au ${fullDate(m.fin)}`});
+    return out.filter(d => d.date && d.date <= t).sort((a,b) => a.date.localeCompare(b.date));
+  }
+
+  // =====================================================================
+  // STATISTIQUES
+  // =====================================================================
+  function barChart(weeks){
+    const W = 640, H = 220, pl = 30, pr = 8, pt = 18, pb = 30;
+    const max = Math.max(...weeks.map(w => w.n), 1);
+    const tick = max <= 5 ? 1 : max <= 12 ? 2 : max <= 30 ? 5 : Math.ceil(max/5/5)*5;
+    const top = Math.ceil(max / tick) * tick;
+    const ih = H - pt - pb, bw = (W - pl - pr) / weeks.length;
+    const y = v => pt + ih * (1 - v / top);
+    let g = '';
+    for (let v = 0; v <= top; v += tick) g += `<line class="gl" x1="${pl}" x2="${W-pr}" y1="${y(v)}" y2="${y(v)}"/><text class="ax" x="${pl-6}" y="${y(v)+4}" text-anchor="end">${v}</text>`;
+    weeks.forEach((w, i) => {
+      const x = pl + i*bw + bw*.18, wdt = bw*.64, last = i === weeks.length - 1;
+      if (w.n) g += `<rect class="bar ${last?'':'past'}" x="${x}" y="${y(w.n)}" width="${wdt}" height="${y(0)-y(w.n)}" rx="3"/><text class="val" x="${x+wdt/2}" y="${y(w.n)-5}" text-anchor="middle">${w.n}</text>`;
+      g += `<text class="ax" x="${x+wdt/2}" y="${H-10}" text-anchor="middle">${last ? 'Cette sem.' : w.label}</text>`;
+    });
+    return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Démarches par semaine">${g}</svg>`;
+  }
+  function renderStats(){
+    const box = $('#statsBody'), all = demarches(), t = todayISO();
+    const cand = S.contacts.length;
+    const answered = S.contacts.filter(c => ['entretien','offre','refus'].includes(c.statut) || S.entretiens.some(e => e.contactId === c.id)).length;
+    const rate = cand ? Math.round(answered / cand * 100) : 0;
+    const entDone = S.entretiens.filter(e => e.date <= t).length, entPos = S.entretiens.filter(e => e.resultat === 'positif').length;
+    const misDays = S.missions.reduce((s,m) => { if (!m.debut || m.debut > t) return s; const end = m.fin < t ? m.fin : t; return s + diffDays(end, m.debut) + 1; }, 0);
+    if (!all.length) { box.innerHTML = `<div class="empty"><h3>Pas encore de statistiques</h3><p>Elles apparaîtront dès que vous aurez ajouté des candidatures, des relances ou des entretiens.</p></div>`; return; }
+    const start = monday(t), weeks = [];
+    for (let i = 9; i >= 0; i--) { const ws = addDays(start, -7*i), we = addDays(ws, 6); weeks.push({label:shortDate(ws), n: all.filter(d => d.date >= ws && d.date <= we).length}); }
+    const thisWeek = weeks[9].n, avg = Math.round(weeks.slice(0,9).reduce((s,w)=>s+w.n,0) / 9 * 10) / 10;
+    const byType = {}; all.forEach(d => byType[d.type] = (byType[d.type]||0) + 1);
+    const orgs = S.contacts.map(c => ({
+      nom:c.nom, type:c.type, relances:c.nbRelances||0,
+      ent:S.entretiens.filter(e => e.contactId === c.id).length,
+      mis:S.missions.filter(m => (m.agence||'').toLowerCase() === c.nom.toLowerCase()).length,
+      statut:c.statut
+    })).sort((a,b) => (b.mis*10 + b.ent*3) - (a.mis*10 + a.ent*3) || a.relances - b.relances).slice(0, 12);
+    box.innerHTML = `
+      <div class="stats">
+        <div class="stat"><b>${cand}</b><span>Candidatures</span><small>agences + entreprises</small></div>
+        <div class="stat"><b>${rate} %</b><span>Taux de réponse</span><small>${answered} sur ${cand} ont répondu</small></div>
+        <div class="stat"><b>${entDone}</b><span>Entretiens passés</span><small>${plural(entPos,'positif')}</small></div>
+        <div class="stat"><b>${misDays}</b><span>Jours de mission</span><small>${plural(S.missions.length,'mission')}</small></div>
+      </div>
+      <div class="panel chart">
+        <div class="vhead"><h2>Démarches par semaine</h2><p class="note">Cette semaine : <b>${thisWeek}</b> · moyenne des 9 précédentes : ${String(avg).replace('.',',')}</p></div>
+        ${barChart(weeks)}
+      </div>
+      <div class="grid-2">
+        <div class="panel"><h2>Répartition</h2>
+          <div style="display:grid;gap:10px">${Object.entries(byType).sort((a,b)=>b[1]-a[1]).map(([k,v]) => `<div style="display:grid;gap:4px"><div class="foot"><span>${esc(k)}</span><span class="mono">${v}</span></div><div class="meter"><i style="width:${Math.round(v/all.length*100)}%;background:var(--accent)"></i></div></div>`).join('')}</div>
+        </div>
+        <div class="panel"><h2>Taux de réponse</h2>
+          <div style="display:grid;gap:12px">
+            ${[['interim',"Agences d'intérim"],['entreprise','Entreprises']].map(([k,l]) => { const list = S.contacts.filter(c=>c.type===k); const a = list.filter(c => ['entretien','offre','refus'].includes(c.statut)).length; const p = list.length ? Math.round(a/list.length*100) : 0; return `<div style="display:grid;gap:4px"><div class="foot"><span>${l}</span><span class="mono">${p} % · ${a}/${list.length}</span></div><div class="meter"><i style="width:${p}%"></i></div></div>`; }).join('')}
+            <p class="note">Une réponse = entretien, offre, mission ou refus.</p>
+          </div>
+        </div>
+      </div>
+      <div class="panel"><h2>Qui vous répond le plus</h2>
+        <div class="tablewrap"><table>
+          <thead><tr><th>Agence / entreprise</th><th>Type</th><th class="num">Relances</th><th class="num">Entretiens</th><th class="num">Missions</th><th>Statut</th></tr></thead>
+          <tbody>${orgs.map(o => `<tr><td>${esc(o.nom)}</td><td>${o.type==='interim'?'Intérim':'Entreprise'}</td><td class="num">${o.relances}</td><td class="num">${o.ent}</td><td class="num">${o.mis}</td><td><span class="pill ${STATUT_PILL[o.statut]}">${STATUT[o.statut]}</span></td></tr>`).join('')}</tbody>
+        </table></div>
+      </div>`;
+  }
+
+  // =====================================================================
+  // BILAN FRANCE TRAVAIL
+  // =====================================================================
+  const monthOf = () => $('#ftMonth').value || todayISO().slice(0,7);
+  const monthLabel = m => { const [y,mo] = m.split('-').map(Number); const s = new Date(y, mo-1, 1).toLocaleDateString('fr-FR',{month:'long',year:'numeric'}); return s[0].toUpperCase() + s.slice(1); };
+  const ftRows = () => demarches().filter(d => d.date.slice(0,7) === monthOf());
+  function reportHtml(){
+    const rows = ftRows(), counts = {};
+    rows.forEach(r => counts[r.type] = (counts[r.type]||0) + 1);
+    return `<div class="report">
+      <div class="rhead">
+        <div><h2>Récapitulatif de mes démarches de recherche d'emploi</h2><p class="muted">${monthLabel(monthOf())}</p></div>
+        <dl><dt>Nom</dt><dd>${esc(S.settings.nom||'—')}</dd><dt>Identifiant France Travail</dt><dd>${esc(S.settings.idFT||'—')}</dd>
+          ${S.settings.tel?`<dt>Téléphone</dt><dd>${esc(S.settings.tel)}</dd>`:''}${S.settings.email?`<dt>Email</dt><dd>${esc(S.settings.email)}</dd>`:''}</dl>
+      </div>
+      <div class="chips"><span class="chip"><b>${rows.length}</b>démarches au total</span>${Object.entries(counts).map(([k,v]) => `<span class="chip"><b>${v}</b>${esc(k.toLowerCase())}</span>`).join('')}</div>
+      ${rows.length ? `<div class="tablewrap"><table>
+        <thead><tr><th>Date</th><th>Démarche</th><th>Entreprise / agence</th><th>Poste</th><th>Moyen / détail</th></tr></thead>
+        <tbody>${rows.map(r => `<tr><td class="mono">${fullDate(r.date)}</td><td>${esc(r.type)}</td><td>${esc(r.org)}</td><td>${esc(r.poste)}</td><td>${esc(r.moyen)}</td></tr>`).join('')}</tbody>
+      </table></div>` : `<p class="note">Aucune démarche enregistrée pour ce mois.</p>`}
+      <p class="note">Document établi le ${fullDate(todayISO())} à partir du logiciel Mes Relances.</p>
+    </div>`;
+  }
+  function renderBilan(){ if (!$('#ftMonth').value) $('#ftMonth').value = todayISO().slice(0,7); $('#ftReport').innerHTML = reportHtml(); }
+  $('#ftMonth').addEventListener('change', renderBilan);
+  $('#ftPdf').addEventListener('click', async () => {
+    $('#printArea').innerHTML = reportHtml();
+    try { if (await window.api.pdf(`Demarches-${monthOf()}${S.settings.nom ? '-' + S.settings.nom.replace(/\s+/g,'-') : ''}.pdf`)) toast('PDF enregistré'); }
+    catch { toast('Impossible de créer le PDF'); }
+  });
+  $('#ftCopy').addEventListener('click', () => {
+    const rows = ftRows();
+    const txt = [`Récapitulatif de mes démarches – ${monthLabel(monthOf())}`, `${S.settings.nom||''}${S.settings.idFT?` – Identifiant France Travail : ${S.settings.idFT}`:''}`, '',
+      ...rows.map(r => `${fullDate(r.date)} – ${r.type} – ${r.org}${r.poste?` – ${r.poste}`:''}${r.moyen?` (${r.moyen})`:''}`), '', `Total : ${plural(rows.length,'démarche')}`].join('\n');
+    copyText(txt, $('#ftReport'));
+  });
+  const csvCell = v => `"${String(v ?? '').replace(/"/g,'""')}"`;
+  $('#ftCsv').addEventListener('click', async () => {
+    const rows = ftRows();
+    const csv = [['Date','Démarche','Entreprise / agence','Poste','Moyen / détail'].map(csvCell).join(';'), ...rows.map(r => [fullDate(r.date), r.type, r.org, r.poste, r.moyen].map(csvCell).join(';'))].join('\r\n');
+    try { if (await window.api.exportCsv(csv, `Demarches-${monthOf()}.csv`)) toast('Fichier Excel exporté'); } catch { toast("Échec de l'export"); }
+  });
+
+  // =====================================================================
+  // RÉGLAGES & THÈME
+  // =====================================================================
+  const THEME_LBL = {auto:'Thème : auto', light:'Thème : clair', dark:'Thème : sombre'};
+  function applyTheme(){
+    const t = S.settings.theme || 'auto';
+    if (t === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = t;
+    $('#themeLbl').textContent = THEME_LBL[t];
+    window.api.setTheme(t).catch(()=>{});
+  }
+  $('#btnTheme').addEventListener('click', async () => {
+    const order = ['auto','light','dark']; S.settings.theme = order[(order.indexOf(S.settings.theme||'auto')+1) % 3];
+    applyTheme(); await persist();
+  });
+  $('#btnSettings').addEventListener('click', async () => {
+    const s = S.settings;
+    $('#sNom').value = s.nom||''; $('#sTel').value = s.tel||''; $('#sEmail').value = s.email||''; $('#sFT').value = s.idFT||'';
+    $('#sDInt').value = s.delaiInterim; $('#sDEnt').value = s.delaiEntreprise; $('#sTheme').value = s.theme||'auto';
+    try { $('#sAuto').checked = await window.api.getAutoStart(); } catch {}
+    try { $('#sPath').textContent = await window.api.dataPath(); } catch {}
+    renderBackup();
+    $('#dlgSet').showModal();
+  });
+  $('#sTheme').addEventListener('change', e => { S.settings.theme = e.target.value; applyTheme(); });
+  $('#sAuto').addEventListener('change', async e => {
+    try { const on = await window.api.setAutoStart(e.target.checked); e.target.checked = on; toast(on ? 'Démarrage automatique activé' : 'Démarrage automatique désactivé'); } catch { toast('Réglage impossible'); }
+  });
+  $('#formSet').addEventListener('submit', async e => {
+    e.preventDefault();
+    Object.assign(S.settings, { nom:$('#sNom').value.trim(), tel:$('#sTel').value.trim(), email:$('#sEmail').value.trim(), idFT:$('#sFT').value.trim(),
+      delaiInterim:Math.max(1, Number($('#sDInt').value)||4), delaiEntreprise:Math.max(1, Number($('#sDEnt').value)||7), theme:$('#sTheme').value });
+    applyTheme(); await persist(); $('#dlgSet').close(); toast('Réglages enregistrés');
+  });
+  $('#btnExport').addEventListener('click', async () => { try { if (await window.api.exportJson()) toast('Sauvegarde exportée'); } catch { toast("Échec de l'export"); } });
+  $('#btnImport').addEventListener('click', async () => {
+    try { const d = await window.api.importJson(); if (!d) return; load(d); applyTheme(); renderAll(); $('#dlgSet').close(); toast('Sauvegarde importée'); }
+    catch { toast("Ce fichier n'est pas une sauvegarde Mes Relances"); }
+  });
+  $('#btnCsv').addEventListener('click', async () => {
+    const cols = [['nom','Nom'],['type','Type'],['poste','Poste'],['contact','Interlocuteur'],['ville','Ville'],['email','Email'],['tel','Téléphone'],['dateCandidature','Candidature'],['statut','Statut'],['nbRelances','Relances'],['derniereAction','Dernier contact'],['prochaineRelance','Prochaine relance'],['notes','Notes']];
+    const rows = S.contacts.map(i => cols.map(([k]) => csvCell(k==='statut' ? STATUT[i.statut] : k==='type' ? (i.type==='interim'?'Intérim':'Entreprise') : i[k])).join(';'));
+    try { if (await window.api.exportCsv([cols.map(c=>csvCell(c[1])).join(';'), ...rows].join('\r\n'))) toast('Fichier Excel exporté'); } catch { toast("Échec de l'export"); }
+  });
+
+  // ---------- Démarrage ----------
+  function load(d){
+    for (const k of COLLS) S[k] = Array.isArray(d[k]) ? d[k] : [];
+    S.settings = {...S.settings, ...(d.settings||{})};
+  }
+  const setToday = () => { const s = new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); $('#today').textContent = s[0].toUpperCase() + s.slice(1); };
+  (async () => {
+    setToday();
+    try { load(await window.api.load()); } catch {}
+    applyTheme();
+    window.api.backupStatus().then(st => { $('#bSet').hidden = !(st.error && S.settings.backup?.enabled); }).catch(()=>{});
+    const start = (location.hash || '').slice(1);
+    go(['relances','prospects','entretiens','missions','paie','formations','documents','stats','bilan'].includes(start) ? start : 'relances');
+    let day = todayISO();
+    setInterval(() => { if (todayISO() !== day) { day = todayISO(); setToday(); renderAll(); } }, 60000);
+  })();
+})();
+</script>
+</body>
+</html>

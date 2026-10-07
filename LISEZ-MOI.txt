@@ -1,0 +1,28 @@
+MES RELANCES 3.0 - Recherche d'emploi : interim et entreprises
+==============================================================
+
+DEMARRER
+Double-cliquez sur "Mes Relances.exe".
+Si Windows affiche "Windows a protege votre ordinateur" :
+cliquez sur "Informations complementaires" puis "Executer quand meme".
+
+CE QUE FAIT LE LOGICIEL
+- Relances : qui relancer aujourd'hui, messages email / SMS / appel prets.
+- A demarcher : carnet d'entreprises a contacter (import Excel possible).
+- Entretiens : rappel la veille et le jour meme, message de remerciement.
+- Missions d'interim : rappel 3 jours avant la fin pour prevenir l'agence.
+- Paie : heures oubliees, indemnite de fin de mission, conges payes.
+- Formations : CACES, soudure, permis... rappel 2 mois avant le recyclage.
+- Documents : CV, lettres, diplomes... en categories et sous-categories.
+- Statistiques et Bilan France Travail (PDF ou Excel).
+- Theme clair ou sombre.
+
+SAUVEGARDE
+Reglages > Sauvegarde automatique : choisissez une cle USB ou un disque
+externe. Vos donnees et documents y sont copies chaque jour ou chaque
+semaine.
+
+IMPORTER UN TABLEAU EXCEL D'ENTREPRISES
+Dans Excel : Fichier > Enregistrer sous > "CSV (separateur : point-virgule)".
+Colonnes reconnues : Entreprise, Secteur, Ville, Adresse, Telephone, Email,
+Site, Contact, Notes.
